@@ -18,16 +18,18 @@ class MouseMorseBoardController {
     this.clearBtn = document.getElementById('clearMouseOutputBtn');
     this.backspaceBtn = document.getElementById('backspaceMouseBtn');
     this.spaceBtn = document.getElementById('spaceMouseBtn');
+    this.slashBtn = document.getElementById('slashMouseBtn');
     this.speakBtn = document.getElementById('speakMouseBtn');
     this.playAudioBtn = document.getElementById('playMouseAudioBtn');
 
-    // Configuration state (loaded from localStorage or defaults)
+    // Configuration state
     this.config = {
       mode: 'dual-click', // 'dual-click', 'single-click-timing', 'custom'
       dualLeft: 'dot',
       dualRight: 'dash',
-      dualMiddle: 'space',
+      dualMiddle: 'slash',
       singleThreshold: 200, // ms for long press (dash)
+      customLongPress: 'dash',
       autoCommit: true,
       letterTimeout: 750, // ms
       wordTimeout: 1800, // ms
@@ -37,12 +39,12 @@ class MouseMorseBoardController {
     };
 
     this.currentMorseBuffer = '';
+    this.lastActionWasSlash = false;
     this.letterTimer = null;
     this.wordTimer = null;
     this.pressStartTime = 0;
     this.isMouseDown = false;
     this.animationFrame = null;
-    this.timerStartTime = 0;
 
     this.loadSavedConfig();
     this.init();
@@ -66,25 +68,24 @@ class MouseMorseBoardController {
   init() {
     if (!this.pad) return;
 
-    // Prevent default context menu inside mouse pad
+    // Prevent context menu on pad
     this.pad.addEventListener('contextmenu', (e) => {
       e.preventDefault();
       return false;
     });
 
-    // Mouse Down on Pad
+    // Mouse events
     this.pad.addEventListener('mousedown', (e) => this.handleMouseDown(e));
-
-    // Mouse Up on Pad or Window
     this.pad.addEventListener('mouseup', (e) => this.handleMouseUp(e));
     window.addEventListener('mouseup', (e) => {
       if (this.isMouseDown) this.handleMouseUp(e);
     });
 
-    // Touch support for mobile devices
+    // Touch events for mobile
     this.pad.addEventListener('touchstart', (e) => {
       e.preventDefault();
-      this.handleMouseDown({ button: 0, clientX: e.touches[0].clientX, clientY: e.touches[0].clientY });
+      const touch = e.touches[0];
+      this.handleMouseDown({ button: 0, clientX: touch.clientX, clientY: touch.clientY });
     }, { passive: false });
 
     this.pad.addEventListener('touchend', (e) => {
@@ -92,7 +93,7 @@ class MouseMorseBoardController {
       this.handleMouseUp({ button: 0 });
     }, { passive: false });
 
-    // Decoded Output Buttons
+    // Output Box Buttons
     if (this.copyBtn) {
       this.copyBtn.addEventListener('click', () => {
         const text = this.outputBox.value;
@@ -125,6 +126,12 @@ class MouseMorseBoardController {
       });
     }
 
+    if (this.slashBtn) {
+      this.slashBtn.addEventListener('click', () => {
+        this.handleSlashAction();
+      });
+    }
+
     if (this.speakBtn) {
       this.speakBtn.addEventListener('click', () => {
         const text = this.outputBox.value.trim();
@@ -146,7 +153,6 @@ class MouseMorseBoardController {
       });
     }
 
-    // Modal Events
     this.bindSettingsModal();
   }
 
@@ -156,10 +162,8 @@ class MouseMorseBoardController {
     this.clearCommitTimers();
     this.pad.classList.add('active-pressed');
 
-    // Visual ripple effect
     this.createRipple(e);
 
-    // Continuous sound tone
     window.morseAudio.setFrequency(this.config.frequency);
     window.morseAudio.setVolume(this.config.soundVolume);
     window.morseAudio.setWaveType(this.config.toneWave);
@@ -181,32 +185,29 @@ class MouseMorseBoardController {
       } else if (button === 2) {
         this.appendSymbol('-');
       } else if (button === 1) {
-        this.commitLetterNow();
-        this.commitWordSpace();
+        this.handleSlashAction();
       }
     } else if (this.config.mode === 'single-click-timing') {
       if (button === 2) {
-        // Right click manually inserts space / slash
-        this.commitLetterNow();
-        this.commitWordSpace();
+        // Right click performs slash / space action
+        this.handleSlashAction();
       } else {
         if (duration >= this.config.singleThreshold) {
-          this.appendSymbol('-');
+          if (this.config.customLongPress === 'slash') {
+            this.handleSlashAction();
+          } else if (this.config.customLongPress === 'space') {
+            this.commitLetterNow();
+            this.commitWordSpace();
+          } else {
+            this.appendSymbol('-'); // default dash
+          }
         } else {
           this.appendSymbol('.');
         }
       }
     } else if (this.config.mode === 'custom') {
       const action = button === 0 ? this.config.dualLeft : (button === 2 ? this.config.dualRight : this.config.dualMiddle);
-      if (action === 'dot') this.appendSymbol('.');
-      else if (action === 'dash') this.appendSymbol('-');
-      else if (action === 'space') {
-        this.commitLetterNow();
-        this.commitWordSpace();
-      } else if (action === 'slash') {
-        this.commitLetterNow();
-        this.appendOutputText(' / ');
-      }
+      this.executeAction(action);
     }
 
     if (this.config.autoCommit) {
@@ -214,8 +215,41 @@ class MouseMorseBoardController {
     }
   }
 
+  executeAction(action) {
+    if (action === 'dot') {
+      this.appendSymbol('.');
+    } else if (action === 'dash') {
+      this.appendSymbol('-');
+    } else if (action === 'slash') {
+      this.handleSlashAction();
+    } else if (action === 'double-slash' || action === 'space') {
+      this.commitLetterNow();
+      this.commitWordSpace();
+    }
+  }
+
+  /**
+   * "/" breaks the character, "//" creates a word space
+   */
+  handleSlashAction() {
+    if (this.currentMorseBuffer.length > 0) {
+      // First slash: commits the active character
+      this.commitLetterNow();
+      this.lastActionWasSlash = true;
+    } else if (this.lastActionWasSlash) {
+      // Second consecutive slash: // -> Word space!
+      this.commitWordSpace();
+      this.lastActionWasSlash = false;
+      window.showToast('Word Space (//)', 'info');
+    } else {
+      this.commitLetterNow();
+      this.lastActionWasSlash = true;
+    }
+  }
+
   appendSymbol(sym) {
     this.currentMorseBuffer += sym;
+    this.lastActionWasSlash = false;
     this.updateBufferUI();
     this.pulsePad(sym);
   }
@@ -244,13 +278,10 @@ class MouseMorseBoardController {
 
   startCommitTimer() {
     this.clearCommitTimers();
-    this.timerStartTime = Date.now();
 
-    // Letter commitment timer
     this.letterTimer = setTimeout(() => {
       this.commitLetterNow();
 
-      // Word space timer triggers after letter timeout if silence continues
       this.wordTimer = setTimeout(() => {
         this.commitWordSpace();
       }, this.config.wordTimeout - this.config.letterTimeout);
@@ -277,7 +308,6 @@ class MouseMorseBoardController {
     const update = () => {
       const elapsed = Date.now() - start;
       const progress = Math.min(1, elapsed / duration);
-      // dashoffset from 100 to 0
       this.progressRing.style.strokeDashoffset = `${100 - progress * 100}`;
       if (progress < 1 && this.letterTimer) {
         this.animationFrame = requestAnimationFrame(update);
@@ -327,6 +357,7 @@ class MouseMorseBoardController {
   clearAll() {
     this.clearCommitTimers();
     this.currentMorseBuffer = '';
+    this.lastActionWasSlash = false;
     this.updateBufferUI();
     if (this.outputBox) this.outputBox.value = '';
   }
@@ -371,7 +402,6 @@ class MouseMorseBoardController {
       });
     }
 
-    // Save settings button
     const saveBtn = document.getElementById('saveMouseSettingsBtn');
     if (saveBtn) {
       saveBtn.addEventListener('click', () => {
@@ -385,6 +415,7 @@ class MouseMorseBoardController {
   populateSettingsForm() {
     const modeSelect = document.getElementById('mouseModeSelect');
     const singleThreshInput = document.getElementById('mouseSingleThreshInput');
+    const customLongPressSelect = document.getElementById('mouseCustomLongPress');
     const letterTimeInput = document.getElementById('mouseLetterTimeInput');
     const wordTimeInput = document.getElementById('mouseWordTimeInput');
     const autoCommitCheck = document.getElementById('mouseAutoCommitCheck');
@@ -397,6 +428,7 @@ class MouseMorseBoardController {
 
     if (modeSelect) modeSelect.value = this.config.mode;
     if (singleThreshInput) singleThreshInput.value = this.config.singleThreshold;
+    if (customLongPressSelect) customLongPressSelect.value = this.config.customLongPress;
     if (letterTimeInput) letterTimeInput.value = this.config.letterTimeout;
     if (wordTimeInput) wordTimeInput.value = this.config.wordTimeout;
     if (autoCommitCheck) autoCommitCheck.checked = this.config.autoCommit;
@@ -407,7 +439,6 @@ class MouseMorseBoardController {
     if (volInput) volInput.value = Math.round(this.config.soundVolume * 100);
     if (waveSelect) waveSelect.value = this.config.toneWave;
 
-    // Toggle conditional form fields
     this.updateModalFieldVisibility();
     if (modeSelect) {
       modeSelect.onchange = () => this.updateModalFieldVisibility();
@@ -426,12 +457,13 @@ class MouseMorseBoardController {
   saveSettingsFromForm() {
     this.config.mode = document.getElementById('mouseModeSelect')?.value || 'dual-click';
     this.config.singleThreshold = parseInt(document.getElementById('mouseSingleThreshInput')?.value, 10) || 200;
+    this.config.customLongPress = document.getElementById('mouseCustomLongPress')?.value || 'dash';
     this.config.letterTimeout = parseInt(document.getElementById('mouseLetterTimeInput')?.value, 10) || 750;
     this.config.wordTimeout = parseInt(document.getElementById('mouseWordTimeInput')?.value, 10) || 1800;
     this.config.autoCommit = document.getElementById('mouseAutoCommitCheck')?.checked ?? true;
     this.config.dualLeft = document.getElementById('mouseLeftAction')?.value || 'dot';
     this.config.dualRight = document.getElementById('mouseRightAction')?.value || 'dash';
-    this.config.dualMiddle = document.getElementById('mouseMiddleAction')?.value || 'space';
+    this.config.dualMiddle = document.getElementById('mouseMiddleAction')?.value || 'slash';
     this.config.frequency = parseInt(document.getElementById('mouseFreqInput')?.value, 10) || 700;
     this.config.soundVolume = (parseInt(document.getElementById('mouseVolInput')?.value, 10) || 30) / 100;
     this.config.toneWave = document.getElementById('mouseWaveSelect')?.value || 'sine';

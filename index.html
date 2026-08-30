@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,7 +15,7 @@
   <canvas id="manaAuraCanvas"></canvas>
 
   <div class="app-wrapper">
-    <!-- Header -->
+    <!-- Header (Scrolls naturally with page) -->
     <header class="main-header">
       <div class="container header-inner">
         <div class="brand-section">
@@ -33,7 +33,7 @@
             <i class="fas fa-volume-up"></i>
           </button>
           <button id="themeToggleBtn" class="btn-icon-labeled" title="Toggle Theme">
-            <i class="fas fa-sun"></i> <span class="btn-text">Light Mode</span>
+            <i class="fas fa-moon"></i> <span class="btn-text">Dark Mode</span>
           </button>
           <button class="btn-icon-labeled open-help-modal-btn" data-guide="general" title="How to use">
             <i class="fas fa-circle-question"></i> <span>Guide</span>
@@ -96,15 +96,16 @@
               <textarea id="translatorTextInput" class="translator-textarea" placeholder="Type plain English text here... (e.g. HELLO WORLD)"></textarea>
             </div>
 
-            <!-- Morse Code Input Box -->
+            <!-- Morse Code Input Box with Speaker Button -->
             <div class="translator-box-wrap">
               <div class="box-header">
                 <span class="box-title"><i class="fas fa-wave-square"></i> Morse Code (. and -)</span>
                 <div class="box-actions">
+                  <button id="playMorseBoxBtn" class="box-action-btn" title="Play Morse Audio"><i class="fas fa-volume-up"></i></button>
                   <button id="copyMorseBtn" class="box-action-btn" title="Copy Morse"><i class="fas fa-copy"></i></button>
                 </div>
               </div>
-              <textarea id="translatorMorseInput" class="translator-textarea morse-code-font" placeholder="Type Morse code here... (. = dot, - = dash, / = space)"></textarea>
+              <textarea id="translatorMorseInput" class="translator-textarea morse-code-font" placeholder="Type Morse code here... (. = dot, - = dash, / = letter break, // = space)"></textarea>
             </div>
           </div>
 
@@ -137,7 +138,7 @@
         <div class="section-header">
           <div>
             <h2 class="section-title"><i class="fas fa-mouse"></i> Mouse Morse Typer</h2>
-            <p class="section-desc">Click on the board to transmit signals. Default: Left Click = Dot (.), Right Click = Dash (-). Pausing commits the letter.</p>
+            <p class="section-desc">Click on the board to transmit signals. Default: Left Click = Dot (.), Right Click = Dash (-). Pausing or clicking (/) commits the letter.</p>
           </div>
           <div class="section-header-actions">
             <button id="openMouseSettingsBtn" class="btn-icon-labeled">
@@ -170,7 +171,7 @@
               <div class="pad-instruction-icon"><i class="fas fa-hand-pointer"></i></div>
               <div class="pad-instruction-text">CLICK HERE TO TRANSMIT MORSE</div>
               <div class="pad-instruction-sub">Left Click = Dot (•) &nbsp;|&nbsp; Right Click = Dash (—)</div>
-              <div class="live-key-hint">Auto-Commit: Pausing for 750ms converts code to letter</div>
+              <div class="live-key-hint">Middle Click / Pause: Commits Letter &bull; Double Slash (//) = Space</div>
             </div>
           </div>
 
@@ -186,7 +187,8 @@
               <button id="copyMouseOutputBtn" class="btn-icon-labeled"><i class="fas fa-copy"></i> Copy</button>
               <button id="speakMouseBtn" class="btn-icon-labeled"><i class="fas fa-volume-high"></i> Speak</button>
               <button id="playMouseAudioBtn" class="btn-icon-labeled"><i class="fas fa-play"></i> Replay</button>
-              <button id="spaceMouseBtn" class="btn-icon-labeled"><i class="fas fa-arrows-left-right"></i> Space</button>
+              <button id="slashMouseBtn" class="btn-icon-labeled"><i class="fas fa-slash"></i> Break (/)</button>
+              <button id="spaceMouseBtn" class="btn-icon-labeled"><i class="fas fa-arrows-left-right"></i> Space (//)</button>
               <button id="backspaceMouseBtn" class="btn-icon-labeled"><i class="fas fa-delete-left"></i> Backspace</button>
               <button id="clearMouseOutputBtn" class="btn-icon-labeled"><i class="fas fa-trash-alt"></i> Clear</button>
             </div>
@@ -201,7 +203,7 @@
         <div class="section-header">
           <div>
             <h2 class="section-title"><i class="fas fa-keyboard"></i> Keyboard Morse Typer</h2>
-            <p class="section-desc">Transmit using your keyboard. Tap Spacebar for Dot, hold Spacebar for Dash, or bind custom keys!</p>
+            <p class="section-desc">Transmit using your keyboard. Tap Spacebar for Dot, hold Spacebar for Dash, or type [.], [-], [/] directly!</p>
           </div>
           <div class="section-header-actions">
             <button id="openKeyboardSettingsBtn" class="btn-icon-labeled">
@@ -233,8 +235,8 @@
             <div id="keyboardActivePad" class="interactive-pad-surface" tabindex="0">
               <div class="pad-instruction-icon"><i class="fas fa-keyboard"></i></div>
               <div class="pad-instruction-text" id="keyboardLiveKeyIndicator">PRESS KEYBOARD KEY TO TRANSMIT</div>
-              <div class="pad-instruction-sub" id="keyboardKeyHintBadge">Active Key: [ SPACEBAR ] (Tap = Dot, Hold = Dash)</div>
-              <div class="live-key-hint">Press Enter for Word Space &nbsp;|&nbsp; Backspace to delete</div>
+              <div class="pad-instruction-sub" id="keyboardKeyHintBadge">Active Key: [ SPACEBAR ] (Tap = Dot, Hold = Dash) | Direct [ . ] [ - ] [ / ] active</div>
+              <div class="live-key-hint">Press [/] for Letter Break &bull; [//] or [Enter] for Word Space</div>
             </div>
           </div>
 
@@ -250,7 +252,8 @@
               <button id="copyKeyboardOutputBtn" class="btn-icon-labeled"><i class="fas fa-copy"></i> Copy</button>
               <button id="speakKeyboardBtn" class="btn-icon-labeled"><i class="fas fa-volume-high"></i> Speak</button>
               <button id="playKeyboardAudioBtn" class="btn-icon-labeled"><i class="fas fa-play"></i> Replay</button>
-              <button id="spaceKeyboardBtn" class="btn-icon-labeled"><i class="fas fa-arrows-left-right"></i> Space</button>
+              <button id="slashKeyboardBtn" class="btn-icon-labeled"><i class="fas fa-slash"></i> Break (/)</button>
+              <button id="spaceKeyboardBtn" class="btn-icon-labeled"><i class="fas fa-arrows-left-right"></i> Space (//)</button>
               <button id="backspaceKeyboardBtn" class="btn-icon-labeled"><i class="fas fa-delete-left"></i> Backspace</button>
               <button id="clearKeyboardOutputBtn" class="btn-icon-labeled"><i class="fas fa-trash-alt"></i> Clear</button>
             </div>
@@ -314,6 +317,7 @@
             <div class="form-group">
               <label for="practiceQuizMode"><i class="fas fa-gamepad"></i> Challenge Mode</label>
               <select id="practiceQuizMode" class="form-control">
+                <option value="all-mixed" selected>⚡ Mixed Challenge (All Modes Shuffled)</option>
                 <option value="morse-to-text">Morse ➔ Character (MCQ)</option>
                 <option value="text-to-morse">Character ➔ Morse (MCQ)</option>
                 <option value="audio-to-text">Audio Tone ➔ Character</option>
@@ -359,13 +363,18 @@
           <!-- Quiz Arena Card -->
           <div class="quiz-main-card" id="quizQuestionContainer">
             <div class="quiz-question-header">
-              <div class="quiz-subtitle" id="quizQuestionSubtitle">Identify the decoded character:</div>
+              <div class="quiz-subtitle" id="quizQuestionSubtitle">Question: Identify the decoded character:</div>
               <div class="quiz-prompt-box">
                 <div class="quiz-prompt-text" id="quizQuestionPrompt">...</div>
-                <button id="quizAudioPlayBtn" class="quiz-audio-play-btn" title="Replay Tone" style="display: none;">
-                  <i class="fas fa-volume-up"></i>
-                </button>
               </div>
+            </div>
+
+            <!-- Dedicated Large Audio Banner for Audio Challenge -->
+            <div class="quiz-audio-banner" id="quizAudioContainer" style="display: none;">
+              <button id="quizAudioPlayBtn" class="quiz-sound-banner-btn" type="button">
+                <i class="fas fa-volume-high"></i> <span>Play Sound Signal</span>
+              </button>
+              <span style="font-size: 13px; color: var(--text-muted);">Click button to listen or replay the audio tone</span>
             </div>
 
             <!-- Multiple Choice Grid -->
@@ -373,13 +382,15 @@
 
             <!-- Interactive Tapping Box Mode -->
             <div class="interactive-tapping-container" id="quizInteractiveTappingBox" style="display: none;">
-              <div class="interactive-tap-buffer" id="quizInteractiveBuffer">Tap code here...</div>
+              <div class="interactive-tap-buffer" id="quizInteractiveBuffer">Tap code using buttons or keyboard...</div>
               <div class="interactive-tap-buttons">
-                <button class="quiz-tap-action-btn" id="quizTapDotBtn">Dot ( . )</button>
-                <button class="quiz-tap-action-btn" id="quizTapDashBtn">Dash ( - )</button>
-                <button class="quiz-tap-action-btn" id="quizTapSpaceBtn">Space ( / )</button>
-                <button class="quiz-tap-action-btn" id="quizTapClearBtn"><i class="fas fa-trash"></i></button>
-                <button class="quiz-tap-action-btn" id="quizTapSubmitBtn" style="background: var(--primary); color: #fff;">Submit Code</button>
+                <button class="quiz-tap-action-btn" id="quizTapDotBtn" type="button">Dot ( . )</button>
+                <button class="quiz-tap-action-btn" id="quizTapDashBtn" type="button">Dash ( - )</button>
+                <button class="quiz-tap-action-btn" id="quizTapSlashBtn" type="button">Break ( / )</button>
+                <button class="quiz-tap-action-btn" id="quizTapSpaceBtn" type="button">Space ( // )</button>
+                <button class="quiz-tap-action-btn" id="quizTapBackspaceBtn" type="button"><i class="fas fa-delete-left"></i></button>
+                <button class="quiz-tap-action-btn" id="quizTapClearBtn" type="button"><i class="fas fa-trash"></i></button>
+                <button class="quiz-tap-action-btn" id="quizTapSubmitBtn" type="button" style="background: var(--primary); color: #fff;">Submit Code</button>
               </div>
               <div class="interactive-feedback-row" id="quizInteractiveFeedback"></div>
             </div>
@@ -406,8 +417,8 @@
 
           <div class="footer-motivation">
             <div class="quote-box">
-              <span id="themeMotivationalQuote">&ldquo;ARISE. Conquer the darkness, awaken your shadow power, and rule the silent frequencies.&rdquo;</span>
-              <div class="quote-author" id="themeMotivationalAuthor">— The Shadow Monarch</div>
+              <span id="themeMotivationalQuote">&ldquo;Knowledge is the crown of the steadfast. Master the royal signal and conquer every realm.&rdquo;</span>
+              <div class="quote-author" id="themeMotivationalAuthor">— King of States</div>
             </div>
           </div>
 
@@ -447,16 +458,24 @@
         <div class="form-group">
           <label for="mouseModeSelect">Input Method</label>
           <select id="mouseModeSelect" class="form-control">
-            <option value="dual-click">Dual Click (Left = Dot, Right = Dash) [Recommended]</option>
-            <option value="single-click-timing">Single Click Timing (Short = Dot, Long = Dash)</option>
+            <option value="dual-click">Dual Click (Left = Dot, Right = Dash, Middle = Break /) [Recommended]</option>
+            <option value="single-click-timing">Single Click Timing (Short = Dot, Long = Dash/Break)</option>
             <option value="custom">Custom Button Assignments</option>
           </select>
         </div>
 
         <div id="mouseSingleTimingGroup" style="display: none;">
           <div class="form-group">
-            <label for="mouseSingleThreshInput">Long Press (Dash) Threshold (ms)</label>
+            <label for="mouseSingleThreshInput">Long Press Threshold (ms)</label>
             <input type="number" id="mouseSingleThreshInput" class="form-control" value="200" min="100" max="600" step="20">
+          </div>
+          <div class="form-group">
+            <label for="mouseCustomLongPress">Long Press Action</label>
+            <select id="mouseCustomLongPress" class="form-control">
+              <option value="dash">Dash (-)</option>
+              <option value="slash">Letter Break (/)</option>
+              <option value="space">Word Space (//)</option>
+            </select>
           </div>
         </div>
 
@@ -466,7 +485,8 @@
             <select id="mouseLeftAction" class="form-control">
               <option value="dot">Dot (.)</option>
               <option value="dash">Dash (-)</option>
-              <option value="space">Letter / Word Break</option>
+              <option value="slash">Letter Break (/)</option>
+              <option value="double-slash">Word Space (//)</option>
             </select>
           </div>
           <div class="form-group">
@@ -474,15 +494,15 @@
             <select id="mouseRightAction" class="form-control">
               <option value="dash">Dash (-)</option>
               <option value="dot">Dot (.)</option>
-              <option value="space">Letter / Word Break</option>
-              <option value="slash">Slash (/)</option>
+              <option value="slash">Letter Break (/)</option>
+              <option value="double-slash">Word Space (//)</option>
             </select>
           </div>
           <div class="form-group">
             <label for="mouseMiddleAction">Middle Click Action</label>
             <select id="mouseMiddleAction" class="form-control">
-              <option value="space">Letter / Word Break</option>
-              <option value="slash">Slash (/)</option>
+              <option value="slash">Letter Break (/)</option>
+              <option value="double-slash">Word Space (//)</option>
               <option value="dot">Dot (.)</option>
               <option value="dash">Dash (-)</option>
             </select>
@@ -582,10 +602,10 @@
             </div>
           </div>
           <div class="form-group">
-            <label>Word Space Key</label>
+            <label>Letter Break (/) Key</label>
             <div style="display: flex; gap: 8px;">
-              <input type="text" id="kbDualSpaceInput" class="form-control" value=" " readonly>
-              <button class="btn-icon-labeled key-record-btn" data-target="kbDualSpaceInput">Set Key</button>
+              <input type="text" id="kbDualSlashInput" class="form-control" value="/" readonly>
+              <button class="btn-icon-labeled key-record-btn" data-target="kbDualSlashInput">Set Key</button>
             </div>
           </div>
         </div>

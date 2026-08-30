@@ -7,12 +7,12 @@ class MorseTranslatorController {
     this.textInput = document.getElementById('translatorTextInput');
     this.morseInput = document.getElementById('translatorMorseInput');
     this.playBtn = document.getElementById('translatorPlayBtn');
+    this.playMorseBoxBtn = document.getElementById('playMorseBoxBtn');
     this.wpmSlider = document.getElementById('translatorWpm');
     this.wpmValueDisplay = document.getElementById('translatorWpmVal');
     this.copyTextBtn = document.getElementById('copyTextBtn');
     this.copyMorseBtn = document.getElementById('copyMorseBtn');
     this.clearBtn = document.getElementById('clearTranslatorBtn');
-    this.swapBtn = document.getElementById('swapTranslatorBtn');
     this.speakTextBtn = document.getElementById('speakTextBtn');
     this.statusIndicator = document.getElementById('translatorStatus');
 
@@ -40,7 +40,6 @@ class MorseTranslatorController {
     this.morseInput.addEventListener('input', () => {
       if (this.isTranslating) return;
       this.isTranslating = true;
-      // Filter out invalid characters directly while typing or normalize
       const morse = this.morseInput.value;
       this.textInput.value = MorseCore.morseToText(morse);
       this.updateStats();
@@ -57,9 +56,16 @@ class MorseTranslatorController {
       });
     }
 
-    // Play / Stop Audio Sequence
+    // Play / Stop Audio Sequence from main button
     if (this.playBtn) {
       this.playBtn.addEventListener('click', () => {
+        this.togglePlayback();
+      });
+    }
+
+    // Play Audio Sequence from the dedicated Morse Box Speaker Icon
+    if (this.playMorseBoxBtn) {
+      this.playMorseBoxBtn.addEventListener('click', () => {
         this.togglePlayback();
       });
     }
@@ -136,7 +142,7 @@ class MorseTranslatorController {
   startPlayback() {
     const morse = this.morseInput.value.trim();
     if (!morse) {
-      window.showToast('Please type text or morse code first', 'warning');
+      window.showToast('Please type text or Morse code first', 'warning');
       return;
     }
 
@@ -144,6 +150,11 @@ class MorseTranslatorController {
     if (this.playBtn) {
       this.playBtn.innerHTML = '<i class="fas fa-stop"></i> Stop Audio';
       this.playBtn.classList.add('playing-pulse');
+    }
+    if (this.playMorseBoxBtn) {
+      this.playMorseBoxBtn.innerHTML = '<i class="fas fa-stop"></i>';
+      this.playMorseBoxBtn.style.color = 'var(--danger)';
+      this.playMorseBoxBtn.title = 'Stop Morse Audio';
     }
     if (this.statusIndicator) {
       this.statusIndicator.textContent = 'Transmitting Audio Signal...';
@@ -154,7 +165,7 @@ class MorseTranslatorController {
       morse,
       this.wpm,
       (idx, symbol) => {
-        // Highlighting or visual beat
+        // Highlighting or progress
       },
       () => {
         this.stopPlayback();
@@ -168,6 +179,11 @@ class MorseTranslatorController {
     if (this.playBtn) {
       this.playBtn.innerHTML = '<i class="fas fa-play"></i> Play Morse Tone';
       this.playBtn.classList.remove('playing-pulse');
+    }
+    if (this.playMorseBoxBtn) {
+      this.playMorseBoxBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+      this.playMorseBoxBtn.style.color = '';
+      this.playMorseBoxBtn.title = 'Play Morse Audio';
     }
     if (this.statusIndicator) {
       this.statusIndicator.textContent = 'Ready';

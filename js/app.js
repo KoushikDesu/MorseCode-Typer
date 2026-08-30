@@ -13,7 +13,9 @@ class AppController {
     this.closeHelpBtn = document.getElementById('closeHelpModalBtn');
     this.themeQuoteText = document.getElementById('themeMotivationalQuote');
     this.themeAuthorText = document.getElementById('themeMotivationalAuthor');
-    this.currentTheme = localStorage.getItem('morse_theme') || 'dark'; // Default to epic dark Solo Leveling
+    
+    // Default to 'light' (Royal Sovereign) theme as requested
+    this.currentTheme = localStorage.getItem('morse_theme') || 'light';
 
     this.init();
   }
@@ -68,7 +70,7 @@ class AppController {
       });
     }
 
-    // Close modals on outside backdrop click
+    // Close modals on backdrop click
     document.querySelectorAll('.modal-overlay').forEach(modal => {
       modal.addEventListener('click', (e) => {
         if (e.target === modal) {
@@ -93,7 +95,7 @@ class AppController {
     // Dynamic Motivation Inscription
     if (this.themeQuoteText && this.themeAuthorText) {
       if (theme === 'dark') {
-        this.themeQuoteText.innerHTML = `&ldquo;ARISE. Conquer the darkness, awaken your true power, and rule the silent frequencies.&rdquo;`;
+        this.themeQuoteText.innerHTML = `&ldquo;ARISE. Conquer the darkness, awaken your shadow power, and rule the silent frequencies.&rdquo;`;
         this.themeAuthorText.innerHTML = `— The Shadow Monarch`;
       } else {
         this.themeQuoteText.innerHTML = `&ldquo;Knowledge is the crown of the steadfast. Master the royal signal and conquer every realm.&rdquo;`;
@@ -119,7 +121,6 @@ class AppController {
       }
     });
 
-    // Smooth scroll to top of content area on mobile
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -133,10 +134,10 @@ class AppController {
         body: `
           <h4>How to Type Morse with your Mouse:</h4>
           <ul>
-            <li><strong>Dual Click (Default):</strong> Left Click triggers a <code>Dot (.)</code>, Right Click triggers a <code>Dash (-)</code>.</li>
-            <li><strong>Silence Auto-Commit:</strong> Pausing your clicks for 750ms automatically translates the current dot/dash combination into its English letter! Pausing for 1.8s inserts a word space.</li>
-            <li><strong>Single Button Timing Mode:</strong> Switch to this mode in Settings. A short tap (< 200ms) produces a dot, while holding down (>= 200ms) produces a dash!</li>
-            <li><strong>Full Customization:</strong> Click <em>Settings</em> to adjust click assignments, dot/dash threshold, letter pause gaps, pitch frequency, and waveforms.</li>
+            <li><strong>Dual Click (Default):</strong> Left Click triggers <code>Dot (.)</code>, Right Click triggers <code>Dash (-)</code>.</li>
+            <li><strong>Letter / Break vs Space:</strong> A single <code>/</code> commits and finishes the current letter. A double <code>//</code> adds a word space!</li>
+            <li><strong>Silence Auto-Commit:</strong> Pausing your clicks for 750ms automatically translates the current dot/dash combination into its English letter!</li>
+            <li><strong>Customization:</strong> Click <em>Input & Sound Options</em> to configure click actions, long press thresholds, pause gaps, and pitch frequency.</li>
           </ul>
         `
       },
@@ -145,9 +146,9 @@ class AppController {
         body: `
           <h4>How to Type Morse with your Keyboard:</h4>
           <ul>
-            <li><strong>Single Key Timing (Default Spacebar):</strong> Tap the Spacebar briefly (< 200ms) for a <code>Dot (.)</code>. Hold the Spacebar longer (>= 200ms) for a <code>Dash (-)</code>.</li>
-            <li><strong>Dual-Key Mode:</strong> Press <kbd>J</kbd> for Dot, <kbd>K</kbd> for Dash, and <kbd>Space</kbd> for word break.</li>
-            <li><strong>Direct Character Mode:</strong> Directly type <code>.</code> and <code>-</code> and <code>/</code> keys.</li>
+            <li><strong>Direct Keys (Active Everywhere):</strong> You can always type <code>.</code> (Dot) and <code>-</code> (Dash) and <code>/</code> (Letter Break) directly from your keyboard!</li>
+            <li><strong>Single Key Timing:</strong> Tap the Spacebar (< 200ms) for Dot, hold Spacebar (>= 200ms) for Dash.</li>
+            <li><strong>Dual-Key Mode:</strong> Press <kbd>J</kbd> for Dot, <kbd>K</kbd> for Dash, and <kbd>/</kbd> for Letter Break.</li>
             <li><strong>Custom Keybinder:</strong> Open Settings and click "Set Key" to bind any physical key on your keyboard.</li>
           </ul>
         `
@@ -160,7 +161,6 @@ class AppController {
             <li>Each letter is visually mapped to its Morse shape (e.g. <strong>A</strong> = Arch <code>.-</code>, <strong>B</strong> = Banjo <code>-...</code>, <strong>S</strong> = Snake <code>...</code>).</li>
             <li>Click the speaker icon on any letter card to listen to its audio frequency.</li>
             <li>Click <strong>Practice This Letter</strong> to test your muscle memory in the sandbox!</li>
-            <li>Click <strong>View Full Visual Mnemonic Chart</strong> to explore the complete illustration chart.</li>
           </ul>
         `
       },
@@ -169,11 +169,9 @@ class AppController {
         body: `
           <h4>Challenge Modes:</h4>
           <ul>
-            <li><strong>Morse to Text:</strong> Look at the Morse code and choose the matching letter or word.</li>
-            <li><strong>Text to Morse:</strong> View the letter and select the correct dot/dash sequence.</li>
-            <li><strong>Audio Listening:</strong> Listen to real-time beeps and identify the signal.</li>
-            <li><strong>Interactive Tapping:</strong> Physically tap the dots & dashes into the live buffer box!</li>
-            <li><strong>Dynamic Generator:</strong> Questions and confusing distractors are generated procedurally with every round.</li>
+            <li><strong>Mixed Challenge (Default):</strong> Shuffles all question types (Morse to Text, Text to Morse, Audio Listening, and Interactive Tapping) for comprehensive training!</li>
+            <li><strong>Audio Listening:</strong> Click the large sound button to hear the signal and identify the letter.</li>
+            <li><strong>Interactive Tapping Box:</strong> Tap dots and dashes using on-screen buttons or keyboard keys!</li>
           </ul>
         `
       },
@@ -208,7 +206,6 @@ class AppController {
       height = canvas.height = window.innerHeight;
     });
 
-    // Particle system for Solo Leveling mana / sparks
     const particles = [];
     const particleCount = 35;
 
@@ -218,7 +215,7 @@ class AppController {
         y: Math.random() * height,
         radius: Math.random() * 2 + 0.8,
         vx: (Math.random() - 0.5) * 0.4,
-        vy: -Math.random() * 0.8 - 0.2, // floating upwards like mana
+        vy: -Math.random() * 0.8 - 0.2,
         alpha: Math.random() * 0.7 + 0.2,
         life: Math.random() * 100
       });

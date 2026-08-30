@@ -19,6 +19,7 @@ class KeyboardMorseBoardController {
     this.clearBtn = document.getElementById('clearKeyboardOutputBtn');
     this.backspaceBtn = document.getElementById('backspaceKeyboardBtn');
     this.spaceBtn = document.getElementById('spaceKeyboardBtn');
+    this.slashBtn = document.getElementById('slashKeyboardBtn');
     this.speakBtn = document.getElementById('speakKeyboardBtn');
     this.playAudioBtn = document.getElementById('playKeyboardAudioBtn');
 
@@ -29,11 +30,7 @@ class KeyboardMorseBoardController {
       singleThreshold: 200, // ms for dash
       dualDotKey: 'j',
       dualDashKey: 'k',
-      dualSpaceKey: ' ',
-      directDotKey: '.',
-      directDashKey: '-',
-      directSlashKey: '/',
-      directSpaceKey: ' ',
+      dualSlashKey: '/',
       autoCommit: true,
       letterTimeout: 750,
       wordTimeout: 1800,
@@ -43,12 +40,13 @@ class KeyboardMorseBoardController {
     };
 
     this.currentMorseBuffer = '';
+    this.lastActionWasSlash = false;
     this.letterTimer = null;
     this.wordTimer = null;
     this.pressStartTime = 0;
     this.isKeyDown = false;
     this.activeKey = null;
-    this.keyListeningTarget = null; // for setting custom key
+    this.keyListeningTarget = null;
 
     this.loadSavedConfig();
     this.init();
@@ -70,11 +68,9 @@ class KeyboardMorseBoardController {
   }
 
   init() {
-    // Global keyboard listener active when Keyboard card is visible or focused
     window.addEventListener('keydown', (e) => this.handleKeyDown(e));
     window.addEventListener('keyup', (e) => this.handleKeyUp(e));
 
-    // Pad focus interaction
     if (this.pad) {
       this.pad.addEventListener('click', () => {
         this.pad.focus();
@@ -82,7 +78,7 @@ class KeyboardMorseBoardController {
       });
     }
 
-    // Output Box Action Buttons
+    // Output Action Buttons
     if (this.copyBtn) {
       this.copyBtn.addEventListener('click', () => {
         const text = this.outputBox.value;
@@ -115,6 +111,12 @@ class KeyboardMorseBoardController {
       });
     }
 
+    if (this.slashBtn) {
+      this.slashBtn.addEventListener('click', () => {
+        this.handleSlashAction();
+      });
+    }
+
     if (this.speakBtn) {
       this.speakBtn.addEventListener('click', () => {
         const text = this.outputBox.value.trim();
@@ -141,8 +143,6 @@ class KeyboardMorseBoardController {
   }
 
   isKeyboardCardActive() {
-    // Only capture keys if user is on the keyboard tab/section or pad is active
-    // and not typing in a text input field or practice input
     const activeElem = document.activeElement;
     if (activeElem && (activeElem.tagName === 'INPUT' || activeElem.tagName === 'TEXTAREA') && activeElem !== this.pad) {
       return false;
@@ -153,7 +153,6 @@ class KeyboardMorseBoardController {
 
   handleKeyDown(e) {
     if (this.keyListeningTarget) {
-      // Keybinding recorder mode
       e.preventDefault();
       this.recordKeyBinding(e.key);
       return;
@@ -164,32 +163,69 @@ class KeyboardMorseBoardController {
     const key = e.key.toLowerCase();
     const rawKey = e.key;
 
-    // Handle single key timing mode
+    // GLOBAL DIRECT KEYS: Always allow typing . and - and / regardless of mode!
+    if (rawKey === '.' && this.config.singleKey !== '.') {
+      e.preventDefault();
+      if (e.repeat) return;
+      this.clearCommitTimers();
+      this.appendSymbol('.');
+      window.morseAudio.playDit();
+      this.setPadVisualActive(true, 'DOT (.) DIRECT KEY');
+      if (this.config.autoCommit) this.startCommitTimer();
+      return;
+    }
+
+    if ((rawKey === '-' || rawKey === '_') && this.config.singleKey !== '-') {
+      e.preventDefault();
+      if (e.repeat) return;
+      this.clearCommitTimers();
+      this.appendSymbol('-');
+      window.morseAudio.playDah();
+      this.setPadVisualActive(true, 'DASH (-) DIRECT KEY');
+      if (this.config.autoCommit) this.startCommitTimer();
+      return;
+    }
+
+    if (rawKey === '/') {
+      e.preventDefault();
+      this.handleSlashAction();
+      this.setPadVisualActive(true, 'SLASH (/) BREAK');
+      return;
+    }
+
+    // Common keys
+    if (key === 'backspace') {
+      e.preventDefault();
+      this.handleBackspace();
+      return;
+    }
+
+    if (key === 'enter') {
+      e.preventDefault();
+      this.commitLetterNow();
+      this.commitWordSpace();
+      return;
+    }
+
+    // Mode 1: Single Key Timing Mode (Spacebar default)
     if (this.config.mode === 'single-key-timing') {
       if (rawKey === this.config.singleKey || key === this.config.singleKey.toLowerCase()) {
         e.preventDefault();
-        if (this.isKeyDown) return; // ignore auto-repeat
+        if (this.isKeyDown) return;
         this.isKeyDown = true;
         this.activeKey = rawKey;
         this.pressStartTime = Date.now();
         this.clearCommitTimers();
         this.setPadVisualActive(true, 'HOLDING KEY...');
         window.morseAudio.startTone();
-      } else if (key === 'backspace') {
-        e.preventDefault();
-        this.handleBackspace();
-      } else if (key === 'enter') {
-        e.preventDefault();
-        this.commitLetterNow();
-        this.commitWordSpace();
       }
     }
 
-    // Handle Dual-Key Mode
+    // Mode 2: Dual-Key Mode
     else if (this.config.mode === 'dual-key') {
       const dotK = this.config.dualDotKey.toLowerCase();
       const dashK = this.config.dualDashKey.toLowerCase();
-      const spaceK = this.config.dualSpaceKey.toLowerCase();
+      const slashK = (this.config.dualSlashKey || '/').toLowerCase();
 
       if (key === dotK) {
         e.preventDefault();
@@ -207,42 +243,23 @@ class KeyboardMorseBoardController {
         window.morseAudio.playDah();
         this.setPadVisualActive(true, 'DASH (-)');
         if (this.config.autoCommit) this.startCommitTimer();
-      } else if (key === spaceK) {
+      } else if (key === slashK) {
+        e.preventDefault();
+        this.handleSlashAction();
+        this.setPadVisualActive(true, 'SLASH (/) BREAK');
+      } else if (key === ' ') {
         e.preventDefault();
         this.commitLetterNow();
         this.commitWordSpace();
-        this.setPadVisualActive(true, 'SPACE ( )');
-      } else if (key === 'backspace') {
-        e.preventDefault();
-        this.handleBackspace();
       }
     }
 
-    // Handle Direct Character Mode
+    // Mode 3: Direct Char Mode
     else if (this.config.mode === 'direct-char') {
-      if (rawKey === this.config.directDotKey) {
-        e.preventDefault();
-        this.clearCommitTimers();
-        this.appendSymbol('.');
-        window.morseAudio.playDit();
-        if (this.config.autoCommit) this.startCommitTimer();
-      } else if (rawKey === this.config.directDashKey) {
-        e.preventDefault();
-        this.clearCommitTimers();
-        this.appendSymbol('-');
-        window.morseAudio.playDah();
-        if (this.config.autoCommit) this.startCommitTimer();
-      } else if (rawKey === this.config.directSlashKey) {
-        e.preventDefault();
-        this.commitLetterNow();
-        this.appendOutputText(' / ');
-      } else if (rawKey === this.config.directSpaceKey) {
+      if (rawKey === ' ') {
         e.preventDefault();
         this.commitLetterNow();
         this.commitWordSpace();
-      } else if (key === 'backspace') {
-        e.preventDefault();
-        this.handleBackspace();
       }
     }
   }
@@ -274,6 +291,20 @@ class KeyboardMorseBoardController {
     }
   }
 
+  handleSlashAction() {
+    if (this.currentMorseBuffer.length > 0) {
+      this.commitLetterNow();
+      this.lastActionWasSlash = true;
+    } else if (this.lastActionWasSlash) {
+      this.commitWordSpace();
+      this.lastActionWasSlash = false;
+      window.showToast('Word Space (//)', 'info');
+    } else {
+      this.commitLetterNow();
+      this.lastActionWasSlash = true;
+    }
+  }
+
   setPadVisualActive(active, text) {
     if (!this.pad) return;
     if (active) {
@@ -288,6 +319,7 @@ class KeyboardMorseBoardController {
 
   appendSymbol(sym) {
     this.currentMorseBuffer += sym;
+    this.lastActionWasSlash = false;
     this.updateBufferUI();
     if (this.pad) {
       this.pad.classList.add(sym === '.' ? 'pulse-dot' : 'pulse-dash');
@@ -390,6 +422,7 @@ class KeyboardMorseBoardController {
   clearAll() {
     this.clearCommitTimers();
     this.currentMorseBuffer = '';
+    this.lastActionWasSlash = false;
     this.updateBufferUI();
     if (this.outputBox) this.outputBox.value = '';
   }
@@ -408,9 +441,9 @@ class KeyboardMorseBoardController {
     if (!badge) return;
     if (this.config.mode === 'single-key-timing') {
       const keyName = this.config.singleKey === ' ' ? 'SPACEBAR' : this.config.singleKey.toUpperCase();
-      badge.textContent = `Active Key: [ ${keyName} ] (Tap = Dot, Hold = Dash)`;
+      badge.textContent = `Active Key: [ ${keyName} ] (Tap = Dot, Hold = Dash) | Also [ . ] [ - ] [ / ] active`;
     } else if (this.config.mode === 'dual-key') {
-      badge.textContent = `Active Keys: Dot [ ${this.config.dualDotKey.toUpperCase()} ] | Dash [ ${this.config.dualDashKey.toUpperCase()} ]`;
+      badge.textContent = `Active Keys: Dot [ ${this.config.dualDotKey.toUpperCase()} ] | Dash [ ${this.config.dualDashKey.toUpperCase()} ] | [ / ] Break`;
     } else {
       badge.textContent = `Direct Typing: [ . ] [ - ] [ / ] [ Space ]`;
     }
@@ -430,7 +463,6 @@ class KeyboardMorseBoardController {
       });
     }
 
-    // Bind Key Recording Buttons
     document.querySelectorAll('.key-record-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const targetField = e.currentTarget.getAttribute('data-target');
@@ -480,7 +512,7 @@ class KeyboardMorseBoardController {
     const autoCommitCheck = document.getElementById('kbAutoCommitCheck');
     const dualDotInput = document.getElementById('kbDualDotInput');
     const dualDashInput = document.getElementById('kbDualDashInput');
-    const dualSpaceInput = document.getElementById('kbDualSpaceInput');
+    const dualSlashInput = document.getElementById('kbDualSlashInput');
 
     if (modeSelect) modeSelect.value = this.config.mode;
     if (singleKeyInput) singleKeyInput.value = this.config.singleKey;
@@ -490,7 +522,7 @@ class KeyboardMorseBoardController {
     if (autoCommitCheck) autoCommitCheck.checked = this.config.autoCommit;
     if (dualDotInput) dualDotInput.value = this.config.dualDotKey;
     if (dualDashInput) dualDashInput.value = this.config.dualDashKey;
-    if (dualSpaceInput) dualSpaceInput.value = this.config.dualSpaceKey;
+    if (dualSlashInput) dualSlashInput.value = this.config.dualSlashKey || '/';
 
     this.updateModalFieldVisibility();
     if (modeSelect) {
@@ -516,7 +548,7 @@ class KeyboardMorseBoardController {
     this.config.autoCommit = document.getElementById('kbAutoCommitCheck')?.checked ?? true;
     this.config.dualDotKey = document.getElementById('kbDualDotInput')?.value || 'j';
     this.config.dualDashKey = document.getElementById('kbDualDashInput')?.value || 'k';
-    this.config.dualSpaceKey = document.getElementById('kbDualSpaceInput')?.value || ' ';
+    this.config.dualSlashKey = document.getElementById('kbDualSlashInput')?.value || '/';
 
     this.saveConfig();
   }

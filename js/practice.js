@@ -11,18 +11,22 @@ class MorsePracticeController {
     this.nextQuestionBtn = document.getElementById('nextQuestionBtn');
     this.skipQuestionBtn = document.getElementById('skipQuestionBtn');
 
-    // Display areas
-    this.questionContainer = document.getElementById('quizQuestionContainer');
+    // Display elements
     this.questionPrompt = document.getElementById('quizQuestionPrompt');
     this.questionSubtitle = document.getElementById('quizQuestionSubtitle');
+    this.audioPlayContainer = document.getElementById('quizAudioContainer');
     this.audioPlayQuestionBtn = document.getElementById('quizAudioPlayBtn');
     this.optionsGrid = document.getElementById('quizOptionsGrid');
     this.interactiveTappingBox = document.getElementById('quizInteractiveTappingBox');
     this.interactiveBuffer = document.getElementById('quizInteractiveBuffer');
     this.interactiveFeedback = document.getElementById('quizInteractiveFeedback');
+    
+    // Tapping buttons
     this.quizDotBtn = document.getElementById('quizTapDotBtn');
     this.quizDashBtn = document.getElementById('quizTapDashBtn');
+    this.quizSlashBtn = document.getElementById('quizTapSlashBtn');
     this.quizSpaceBtn = document.getElementById('quizTapSpaceBtn');
+    this.quizBackspaceBtn = document.getElementById('quizTapBackspaceBtn');
     this.quizClearBtn = document.getElementById('quizTapClearBtn');
     this.quizSubmitBtn = document.getElementById('quizTapSubmitBtn');
 
@@ -34,8 +38,9 @@ class MorsePracticeController {
     this.rankBadge = document.getElementById('quizRankBadge');
 
     // State
-    this.currentMode = 'morse-to-text'; // 'morse-to-text', 'text-to-morse', 'audio-to-text', 'interactive-tap'
-    this.difficulty = 'novice'; // 'novice' (A-Z), 'adept' (A-Z, 0-9), 'master' (Words)
+    this.selectedMode = 'all-mixed'; // 'all-mixed' (Default), 'morse-to-text', 'text-to-morse', 'audio-to-text', 'interactive-tap'
+    this.activeQuestionMode = 'morse-to-text';
+    this.difficulty = 'novice';
     this.currentQuestion = null;
     this.score = 0;
     this.streak = 0;
@@ -66,8 +71,9 @@ class MorsePracticeController {
 
   init() {
     if (this.quizModeSelect) {
+      this.quizModeSelect.value = 'all-mixed';
       this.quizModeSelect.addEventListener('change', (e) => {
-        this.currentMode = e.target.value;
+        this.selectedMode = e.target.value;
         this.generateNewQuestion();
       });
     }
@@ -87,6 +93,7 @@ class MorsePracticeController {
         this.correctAnswers = 0;
         this.updateStatsUI();
         this.generateNewQuestion();
+        window.showToast('Quiz arena restarted!', 'info');
       });
     }
 
@@ -101,14 +108,14 @@ class MorsePracticeController {
         this.streak = 0;
         this.updateStatsUI();
         this.generateNewQuestion();
+        window.showToast('Question skipped', 'info');
       });
     }
 
+    // Audio Play Button
     if (this.audioPlayQuestionBtn) {
       this.audioPlayQuestionBtn.addEventListener('click', () => {
-        if (this.currentQuestion && this.currentQuestion.morse) {
-          window.morseAudio.playMorseSequence(this.currentQuestion.morse, 16);
-        }
+        this.playCurrentAudioQuestion();
       });
     }
 
@@ -127,9 +134,21 @@ class MorsePracticeController {
       });
     }
 
+    if (this.quizSlashBtn) {
+      this.quizSlashBtn.addEventListener('click', () => {
+        this.appendInteractiveSymbol(' / ');
+      });
+    }
+
     if (this.quizSpaceBtn) {
       this.quizSpaceBtn.addEventListener('click', () => {
         this.appendInteractiveSymbol(' ');
+      });
+    }
+
+    if (this.quizBackspaceBtn) {
+      this.quizBackspaceBtn.addEventListener('click', () => {
+        this.handleInteractiveBackspace();
       });
     }
 
@@ -146,27 +165,29 @@ class MorsePracticeController {
       });
     }
 
-    // Keyboard support when tapping inside interactive challenge
+    // Direct Keyboard Support in Practice Mode
     window.addEventListener('keydown', (e) => {
       const practiceTab = document.getElementById('tab-practice');
       if (!practiceTab || !practiceTab.classList.contains('active-tab')) return;
-      if (this.currentMode !== 'interactive-tap' || this.isAnswered) return;
+      if (this.activeQuestionMode !== 'interactive-tap' || this.isAnswered) return;
 
       if (e.key === '.') {
         e.preventDefault();
         this.appendInteractiveSymbol('.');
         window.morseAudio.playDit();
-      } else if (e.key === '-') {
+      } else if (e.key === '-' || e.key === '_') {
         e.preventDefault();
         this.appendInteractiveSymbol('-');
         window.morseAudio.playDah();
+      } else if (e.key === '/') {
+        e.preventDefault();
+        this.appendInteractiveSymbol(' / ');
       } else if (e.key === ' ' || e.key === 'Spacebar') {
         e.preventDefault();
         this.appendInteractiveSymbol(' ');
       } else if (e.key === 'Backspace') {
         e.preventDefault();
-        this.interactiveInput = this.interactiveInput.slice(0, -1);
-        this.updateInteractiveUI();
+        this.handleInteractiveBackspace();
       } else if (e.key === 'Enter') {
         e.preventDefault();
         this.submitInteractiveAnswer();
@@ -176,14 +197,49 @@ class MorsePracticeController {
     this.generateNewQuestion();
   }
 
+  handleInteractiveBackspace() {
+    if (this.interactiveInput.endsWith(' / ')) {
+      this.interactiveInput = this.interactiveInput.slice(0, -3);
+    } else if (this.interactiveInput.length > 0) {
+      this.interactiveInput = this.interactiveInput.slice(0, -1);
+    }
+    this.updateInteractiveUI();
+  }
+
+  playCurrentAudioQuestion() {
+    if (this.currentQuestion && this.currentQuestion.morse) {
+      if (this.audioPlayQuestionBtn) {
+        this.audioPlayQuestionBtn.classList.add('playing-pulse');
+      }
+      window.morseAudio.playMorseSequence(
+        this.currentQuestion.morse,
+        16,
+        null,
+        () => {
+          if (this.audioPlayQuestionBtn) {
+            this.audioPlayQuestionBtn.classList.remove('playing-pulse');
+          }
+        }
+      );
+    }
+  }
+
   /**
-   * Procedurally generates a question without hardcoding
+   * Procedural Question Generator
    */
   generateNewQuestion() {
     this.isAnswered = false;
     this.interactiveInput = '';
     this.updateInteractiveUI();
     if (this.nextQuestionBtn) this.nextQuestionBtn.style.display = 'none';
+
+    // Determine Mode for this question
+    if (this.selectedMode === 'all-mixed') {
+      const modes = ['morse-to-text', 'text-to-morse', 'audio-to-text', 'interactive-tap'];
+      this.activeQuestionMode = modes[Math.floor(Math.random() * modes.length)];
+    } else {
+      this.activeQuestionMode = this.selectedMode;
+    }
 
     let targetChar = '';
     let targetMorse = '';
@@ -199,7 +255,7 @@ class MorsePracticeController {
       targetChar = pool[Math.floor(Math.random() * pool.length)];
       targetMorse = MorseCore.MORSE_MAP[targetChar];
     } else {
-      // Shadow Master (Words)
+      // Master
       const wordList = MorseCore.PRACTICE_WORDS.medium;
       targetChar = wordList[Math.floor(Math.random() * wordList.length)];
       targetMorse = MorseCore.textToMorse(targetChar);
@@ -208,10 +264,10 @@ class MorsePracticeController {
     this.currentQuestion = {
       target: targetChar,
       morse: targetMorse,
-      mode: this.currentMode
+      mode: this.activeQuestionMode
     };
 
-    if (this.currentMode === 'interactive-tap') {
+    if (this.activeQuestionMode === 'interactive-tap') {
       this.setupInteractiveQuestion();
     } else {
       this.setupMultipleChoiceQuestion();
@@ -221,42 +277,47 @@ class MorsePracticeController {
   setupMultipleChoiceQuestion() {
     if (this.optionsGrid) this.optionsGrid.style.display = 'grid';
     if (this.interactiveTappingBox) this.interactiveTappingBox.style.display = 'none';
-    if (this.audioPlayQuestionBtn) this.audioPlayQuestionBtn.style.display = (this.currentMode === 'audio-to-text') ? 'inline-flex' : 'none';
 
-    // Set Question Prompt based on Mode
-    if (this.currentMode === 'morse-to-text') {
+    if (this.activeQuestionMode === 'morse-to-text') {
+      if (this.audioPlayContainer) this.audioPlayContainer.style.display = 'none';
+      this.questionPrompt.style.display = 'block';
       this.questionPrompt.textContent = this.currentQuestion.morse;
-      this.questionSubtitle.textContent = 'Identify the decoded letter or word:';
+      this.questionSubtitle.textContent = 'Question: Decode the Morse code to English:';
       this.generateDistractorsAndRender(this.currentQuestion.target, false);
-    } else if (this.currentMode === 'text-to-morse') {
+    } else if (this.activeQuestionMode === 'text-to-morse') {
+      if (this.audioPlayContainer) this.audioPlayContainer.style.display = 'none';
+      this.questionPrompt.style.display = 'block';
       this.questionPrompt.textContent = this.currentQuestion.target;
-      this.questionSubtitle.textContent = 'Select the correct Morse code sequence:';
+      this.questionSubtitle.textContent = 'Question: Select the matching Morse code sequence:';
       this.generateDistractorsAndRender(this.currentQuestion.morse, true);
-    } else if (this.currentMode === 'audio-to-text') {
-      this.questionPrompt.textContent = '🎧 [ AUDIO SIGNAL ]';
-      this.questionSubtitle.textContent = 'Listen carefully to the beeps and choose the answer:';
+    } else if (this.activeQuestionMode === 'audio-to-text') {
+      if (this.audioPlayContainer) this.audioPlayContainer.style.display = 'flex';
+      this.questionPrompt.style.display = 'none';
+      this.questionSubtitle.textContent = 'Question: Listen to the audio tone and choose the answer:';
       this.generateDistractorsAndRender(this.currentQuestion.target, false);
-      // Auto play audio tone
+      
+      // Play audio automatically after small delay
       setTimeout(() => {
-        window.morseAudio.playMorseSequence(this.currentQuestion.morse, 16);
-      }, 300);
+        this.playCurrentAudioQuestion();
+      }, 350);
     }
   }
 
   setupInteractiveQuestion() {
     if (this.optionsGrid) this.optionsGrid.style.display = 'none';
+    if (this.audioPlayContainer) this.audioPlayContainer.style.display = 'none';
     if (this.interactiveTappingBox) this.interactiveTappingBox.style.display = 'block';
-    if (this.audioPlayQuestionBtn) this.audioPlayQuestionBtn.style.display = 'inline-flex';
 
+    this.questionPrompt.style.display = 'block';
     this.questionPrompt.textContent = this.currentQuestion.target;
-    this.questionSubtitle.textContent = 'Tap the exact Morse code using buttons or keyboard:';
+    this.questionSubtitle.textContent = 'Challenge: Tap the exact Morse code for this character/word:';
     if (this.interactiveFeedback) {
-      this.interactiveFeedback.innerHTML = `<span>Expected: <strong>${this.currentQuestion.target}</strong></span>`;
+      this.interactiveFeedback.innerHTML = `<span>Target: <strong>${this.currentQuestion.target}</strong> (${this.currentQuestion.morse})</span>`;
     }
   }
 
   /**
-   * Generates 4 options (1 correct + 3 smart confusing distractors)
+   * Generates 4 options with smart confusing distractors
    */
   generateDistractorsAndRender(correctValue, isMorse = false) {
     if (!this.optionsGrid) return;
@@ -273,7 +334,6 @@ class MorsePracticeController {
       let distractor = '';
 
       if (!isMorse) {
-        // Character distractors: pick random similar character or word
         if (this.difficulty === 'master') {
           const wList = MorseCore.PRACTICE_WORDS.medium;
           distractor = wList[Math.floor(Math.random() * wList.length)];
@@ -281,15 +341,11 @@ class MorsePracticeController {
           distractor = allPool[Math.floor(Math.random() * allPool.length)];
         }
       } else {
-        // Morse code distractors: generate plausible Morse confusion
         if (Math.random() < 0.4) {
-          // Invert dots and dashes
           distractor = correctValue.replace(/\./g, 'X').replace(/-/g, '.').replace(/X/g, '-');
         } else if (Math.random() < 0.7) {
-          // Reverse symbol order
           distractor = correctValue.split('').reverse().join('');
         } else {
-          // Pick a random other symbol's Morse code
           const randChar = allPool[Math.floor(Math.random() * allPool.length)];
           distractor = MorseCore.MORSE_MAP[randChar] || '.-';
         }
@@ -300,7 +356,7 @@ class MorsePracticeController {
       }
     }
 
-    // Shuffle options array (Fisher-Yates)
+    // Shuffle options array
     for (let i = options.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [options[i], options[j]] = [options[j], options[i]];
@@ -312,7 +368,8 @@ class MorsePracticeController {
       btn.className = 'quiz-option-btn';
       btn.innerHTML = `<span class="opt-index">${['A', 'B', 'C', 'D'][idx]}</span> <span class="opt-val">${opt}</span>`;
 
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
         this.handleMultipleChoiceAnswer(btn, opt, correctValue);
       });
 
@@ -338,9 +395,8 @@ class MorsePracticeController {
       selectedBtn.classList.add('wrong-choice');
       this.streak = 0;
       window.morseAudio.playErrorSound();
-      window.showToast(`Incorrect. Correct answer was ${correctValue}`, 'error');
+      window.showToast(`Incorrect. Correct answer was "${correctValue}"`, 'error');
 
-      // Highlight the correct button
       const allBtns = this.optionsGrid.querySelectorAll('.quiz-option-btn');
       allBtns.forEach(btn => {
         if (btn.querySelector('.opt-val').textContent === correctValue) {
@@ -360,7 +416,6 @@ class MorsePracticeController {
       this.nextQuestionBtn.style.display = 'inline-flex';
     }
 
-    // Auto proceed on correct after short delay
     if (isCorrect) {
       setTimeout(() => {
         if (this.isAnswered) this.generateNewQuestion();
@@ -376,17 +431,17 @@ class MorsePracticeController {
 
   updateInteractiveUI() {
     if (this.interactiveBuffer) {
-      this.interactiveBuffer.textContent = this.interactiveInput || 'Tap code here...';
+      this.interactiveBuffer.textContent = this.interactiveInput || 'Tap code using buttons or keyboard...';
     }
   }
 
   submitInteractiveAnswer() {
     if (this.isAnswered) return;
-    const cleanUser = this.interactiveInput.trim().replace(/[—–−_]/g, '-').replace(/[•·]/g, '.');
-    const cleanTarget = this.currentQuestion.morse.trim().replace(/[—–−_]/g, '-').replace(/[•·]/g, '.');
+    const cleanUser = this.interactiveInput.trim().replace(/[—–−_]/g, '-').replace(/[•·]/g, '').replace(/\s+/g, ' ');
+    const cleanTarget = this.currentQuestion.morse.trim().replace(/[—–−_]/g, '-').replace(/[•·]/g, '').replace(/\s+/g, ' ');
 
     if (!cleanUser) {
-      window.showToast('Please tap Morse symbols first', 'warning');
+      window.showToast('Please enter Morse code first', 'warning');
       return;
     }
 
@@ -400,14 +455,14 @@ class MorsePracticeController {
       this.correctAnswers++;
       window.morseAudio.playSuccessSound();
       if (this.interactiveFeedback) {
-        this.interactiveFeedback.innerHTML = `<span class="correct-text"><i class="fas fa-check-circle"></i> AWESOME! Perfect match! (+15 pts)</span>`;
+        this.interactiveFeedback.innerHTML = `<span class="correct-text"><i class="fas fa-check-circle"></i> CORRECT! Perfect signal (+15 pts)</span>`;
       }
-      window.showToast('Spot on! Perfect signal!', 'success');
+      window.showToast('Perfect signal match!', 'success');
     } else {
       this.streak = 0;
       window.morseAudio.playErrorSound();
       if (this.interactiveFeedback) {
-        this.interactiveFeedback.innerHTML = `<span class="wrong-text"><i class="fas fa-times-circle"></i> Wrong: You entered [${cleanUser}], expected [${cleanTarget}]</span>`;
+        this.interactiveFeedback.innerHTML = `<span class="wrong-text"><i class="fas fa-times-circle"></i> Mismatch: Entered [${cleanUser}], expected [${cleanTarget}]</span>`;
       }
       window.showToast('Signal mismatch!', 'error');
     }
@@ -438,7 +493,6 @@ class MorsePracticeController {
     const accuracy = this.totalQuestions > 0 ? Math.round((this.correctAnswers / this.totalQuestions) * 100) : 100;
     if (this.accuracyDisplay) this.accuracyDisplay.textContent = `${accuracy}%`;
 
-    // Dynamic Rank Title (Solo Leveling inspired)
     if (this.rankBadge) {
       if (this.score >= 300) {
         this.rankBadge.textContent = '👑 Shadow Monarch';
