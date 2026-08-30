@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MORSE CODE | King of States & Solo Leveling Edition</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Solo Leveling Screen Perimeter Mana Aura Shader -->
+  <div class="screen-mana-shader"></div>
+  <canvas id="manaAuraCanvas"></canvas>
+
+  <div class="app-wrapper">
+    <!-- Header -->
+    <header class="main-header">
+      <div class="container header-inner">
+        <div class="brand-section">
+          <div class="brand-icon">
+            <i class="fas fa-satellite-dish"></i>
+          </div>
+          <div class="brand-titles">
+            <h1 class="main-title">MORSE CODE</h1>
+            <div class="morse-sub-title">-- --- .-. ... . / -.-. --- -.. .</div>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <button id="soundToggleBtn" class="btn-icon-only" title="Toggle Sound">
+            <i class="fas fa-volume-up"></i>
+          </button>
+          <button id="themeToggleBtn" class="btn-icon-labeled" title="Toggle Theme">
+            <i class="fas fa-sun"></i> <span class="btn-text">Light Mode</span>
+          </button>
+          <button class="btn-icon-labeled open-help-modal-btn" data-guide="general" title="How to use">
+            <i class="fas fa-circle-question"></i> <span>Guide</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Top Navigation Tabs / Cards -->
+    <nav class="navigation-bar">
+      <div class="container nav-tabs-grid">
+        <button class="nav-tab-btn active" data-tab="home">
+          <i class="fas fa-exchange-alt"></i> Live Translator
+        </button>
+        <button class="nav-tab-btn" data-tab="mouse">
+          <i class="fas fa-mouse"></i> Mouse Typer
+        </button>
+        <button class="nav-tab-btn" data-tab="keyboard">
+          <i class="fas fa-keyboard"></i> Keyboard Typer
+        </button>
+        <button class="nav-tab-btn" data-tab="learn">
+          <i class="fas fa-graduation-cap"></i> Learn Morse
+        </button>
+        <button class="nav-tab-btn" data-tab="practice">
+          <i class="fas fa-crosshairs"></i> Practice & Quiz
+        </button>
+      </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="main-content container">
+
+      <!-- ====================================================================
+           TAB 1: LIVE TRANSLATOR (HOME)
+           ==================================================================== -->
+      <section id="tab-home" class="tab-pane active-tab">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title"><i class="fas fa-bolt"></i> Real-Time Bidirectional Translator</h2>
+            <p class="section-desc">Type English text or Morse code directly — converts instantly in both directions with realistic audio playback.</p>
+          </div>
+          <div class="section-header-actions">
+            <button class="btn-icon-labeled open-help-modal-btn" data-guide="general">
+              <i class="fas fa-circle-info"></i> How it works
+            </button>
+          </div>
+        </div>
+
+        <div class="translator-card">
+          <div class="translator-grid">
+            <!-- Plain Text Input Box -->
+            <div class="translator-box-wrap">
+              <div class="box-header">
+                <span class="box-title"><i class="fas fa-font"></i> Plain English Text</span>
+                <div class="box-actions">
+                  <button id="speakTextBtn" class="box-action-btn" title="Speak Text (TTS)"><i class="fas fa-volume-high"></i></button>
+                  <button id="copyTextBtn" class="box-action-btn" title="Copy Text"><i class="fas fa-copy"></i></button>
+                </div>
+              </div>
+              <textarea id="translatorTextInput" class="translator-textarea" placeholder="Type plain English text here... (e.g. HELLO WORLD)"></textarea>
+            </div>
+
+            <!-- Morse Code Input Box -->
+            <div class="translator-box-wrap">
+              <div class="box-header">
+                <span class="box-title"><i class="fas fa-wave-square"></i> Morse Code (. and -)</span>
+                <div class="box-actions">
+                  <button id="copyMorseBtn" class="box-action-btn" title="Copy Morse"><i class="fas fa-copy"></i></button>
+                </div>
+              </div>
+              <textarea id="translatorMorseInput" class="translator-textarea morse-code-font" placeholder="Type Morse code here... (. = dot, - = dash, / = space)"></textarea>
+            </div>
+          </div>
+
+          <!-- Translator Control Bar -->
+          <div class="translator-toolbar">
+            <div class="wpm-control">
+              <label for="translatorWpm"><i class="fas fa-gauge-high"></i> Speed:</label>
+              <input type="range" id="translatorWpm" class="wpm-slider" min="5" max="35" value="18">
+              <span id="translatorWpmVal">18 WPM</span>
+            </div>
+
+            <div class="translator-actions">
+              <button id="translatorPlayBtn" class="btn-icon-labeled" style="background: var(--primary); color: #fff;">
+                <i class="fas fa-play"></i> Play Morse Tone
+              </button>
+              <button id="clearTranslatorBtn" class="btn-icon-labeled">
+                <i class="fas fa-trash-alt"></i> Clear All
+              </button>
+            </div>
+
+            <div class="stats-badge" id="translatorStats">0 Characters | 0 Morse Signals</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           TAB 2: MOUSE MORSE TYPER (CARD 1)
+           ==================================================================== -->
+      <section id="tab-mouse" class="tab-pane">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title"><i class="fas fa-mouse"></i> Mouse Morse Typer</h2>
+            <p class="section-desc">Click on the board to transmit signals. Default: Left Click = Dot (.), Right Click = Dash (-). Pausing commits the letter.</p>
+          </div>
+          <div class="section-header-actions">
+            <button id="openMouseSettingsBtn" class="btn-icon-labeled">
+              <i class="fas fa-sliders"></i> Input & Sound Options
+            </button>
+            <button class="btn-icon-labeled open-help-modal-btn" data-guide="mouse">
+              <i class="fas fa-question-circle"></i> Instructions
+            </button>
+          </div>
+        </div>
+
+        <div class="typer-workspace">
+          <!-- Pad Card -->
+          <div class="tapping-pad-card">
+            <!-- Board 1: Live Active Buffer Display -->
+            <div class="live-buffer-board">
+              <div class="buffer-content-wrap">
+                <span class="buffer-symbols" id="mouseBufferDisplay">— — —</span>
+                <span class="buffer-char-preview" id="mouseCharPreview"></span>
+              </div>
+              <svg class="commit-timer-svg" viewBox="0 0 36 36">
+                <path class="timer-circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <path id="mouseTimerProgress" class="timer-circle-val" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              </svg>
+              <div id="mouseCommitFlash" class="commit-flash-overlay"></div>
+            </div>
+
+            <!-- Interactive Mouse Clicking Pad -->
+            <div id="mouseClickPad" class="interactive-pad-surface">
+              <div class="pad-instruction-icon"><i class="fas fa-hand-pointer"></i></div>
+              <div class="pad-instruction-text">CLICK HERE TO TRANSMIT MORSE</div>
+              <div class="pad-instruction-sub">Left Click = Dot (•) &nbsp;|&nbsp; Right Click = Dash (—)</div>
+              <div class="live-key-hint">Auto-Commit: Pausing for 750ms converts code to letter</div>
+            </div>
+          </div>
+
+          <!-- Board 2: Decoded Text Output Card -->
+          <div class="decoded-output-card">
+            <div class="box-header">
+              <span class="box-title"><i class="fas fa-file-alt"></i> Decoded Text Output</span>
+              <span class="stats-badge">Live Transcript</span>
+            </div>
+            <textarea id="mouseDecodedOutput" class="decoded-output-textarea" placeholder="Your typed text will appear here letter by letter..."></textarea>
+            
+            <div class="output-action-bar">
+              <button id="copyMouseOutputBtn" class="btn-icon-labeled"><i class="fas fa-copy"></i> Copy</button>
+              <button id="speakMouseBtn" class="btn-icon-labeled"><i class="fas fa-volume-high"></i> Speak</button>
+              <button id="playMouseAudioBtn" class="btn-icon-labeled"><i class="fas fa-play"></i> Replay</button>
+              <button id="spaceMouseBtn" class="btn-icon-labeled"><i class="fas fa-arrows-left-right"></i> Space</button>
+              <button id="backspaceMouseBtn" class="btn-icon-labeled"><i class="fas fa-delete-left"></i> Backspace</button>
+              <button id="clearMouseOutputBtn" class="btn-icon-labeled"><i class="fas fa-trash-alt"></i> Clear</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           TAB 3: KEYBOARD MORSE TYPER (CARD 2)
+           ==================================================================== -->
+      <section id="tab-keyboard" class="tab-pane">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title"><i class="fas fa-keyboard"></i> Keyboard Morse Typer</h2>
+            <p class="section-desc">Transmit using your keyboard. Tap Spacebar for Dot, hold Spacebar for Dash, or bind custom keys!</p>
+          </div>
+          <div class="section-header-actions">
+            <button id="openKeyboardSettingsBtn" class="btn-icon-labeled">
+              <i class="fas fa-sliders"></i> Keybindings & Modes
+            </button>
+            <button class="btn-icon-labeled open-help-modal-btn" data-guide="keyboard">
+              <i class="fas fa-question-circle"></i> Instructions
+            </button>
+          </div>
+        </div>
+
+        <div class="typer-workspace">
+          <!-- Keyboard Pad Card -->
+          <div class="tapping-pad-card">
+            <!-- Board 1: Live Active Buffer Display -->
+            <div class="live-buffer-board">
+              <div class="buffer-content-wrap">
+                <span class="buffer-symbols" id="keyboardBufferDisplay">— — —</span>
+                <span class="buffer-char-preview" id="keyboardCharPreview"></span>
+              </div>
+              <svg class="commit-timer-svg" viewBox="0 0 36 36">
+                <path class="timer-circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <path id="keyboardTimerProgress" class="timer-circle-val" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              </svg>
+              <div id="keyboardCommitFlash" class="commit-flash-overlay"></div>
+            </div>
+
+            <!-- Focused Keyboard Pad Surface -->
+            <div id="keyboardActivePad" class="interactive-pad-surface" tabindex="0">
+              <div class="pad-instruction-icon"><i class="fas fa-keyboard"></i></div>
+              <div class="pad-instruction-text" id="keyboardLiveKeyIndicator">PRESS KEYBOARD KEY TO TRANSMIT</div>
+              <div class="pad-instruction-sub" id="keyboardKeyHintBadge">Active Key: [ SPACEBAR ] (Tap = Dot, Hold = Dash)</div>
+              <div class="live-key-hint">Press Enter for Word Space &nbsp;|&nbsp; Backspace to delete</div>
+            </div>
+          </div>
+
+          <!-- Board 2: Decoded Text Output Card -->
+          <div class="decoded-output-card">
+            <div class="box-header">
+              <span class="box-title"><i class="fas fa-file-alt"></i> Decoded Text Output</span>
+              <span class="stats-badge">Live Transcript</span>
+            </div>
+            <textarea id="keyboardDecodedOutput" class="decoded-output-textarea" placeholder="Your typed text will appear here letter by letter..."></textarea>
+            
+            <div class="output-action-bar">
+              <button id="copyKeyboardOutputBtn" class="btn-icon-labeled"><i class="fas fa-copy"></i> Copy</button>
+              <button id="speakKeyboardBtn" class="btn-icon-labeled"><i class="fas fa-volume-high"></i> Speak</button>
+              <button id="playKeyboardAudioBtn" class="btn-icon-labeled"><i class="fas fa-play"></i> Replay</button>
+              <button id="spaceKeyboardBtn" class="btn-icon-labeled"><i class="fas fa-arrows-left-right"></i> Space</button>
+              <button id="backspaceKeyboardBtn" class="btn-icon-labeled"><i class="fas fa-delete-left"></i> Backspace</button>
+              <button id="clearKeyboardOutputBtn" class="btn-icon-labeled"><i class="fas fa-trash-alt"></i> Clear</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           TAB 4: LEARN MORSE CODE (CARD 3)
+           ==================================================================== -->
+      <section id="tab-learn" class="tab-pane">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title"><i class="fas fa-graduation-cap"></i> Learn Morse Code by Mnemonics</h2>
+            <p class="section-desc">Master the alphabet and numbers with visual shape mnemonics, audio tone cues, and interactive sandboxes.</p>
+          </div>
+          <div class="section-header-actions">
+            <button id="viewFullChartBtn" class="btn-icon-labeled" style="background: var(--primary); color: #fff;">
+              <i class="fas fa-image"></i> View Visual Mnemonic Chart
+            </button>
+            <button class="btn-icon-labeled open-help-modal-btn" data-guide="learn">
+              <i class="fas fa-question-circle"></i> Instructions
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter & Search Bar -->
+        <div class="learn-filters-bar">
+          <div class="filter-btn-group">
+            <button class="learn-filter-btn active" data-filter="all">All Symbols</button>
+            <button class="learn-filter-btn" data-filter="letters">Letters (A-Z)</button>
+            <button class="learn-filter-btn" data-filter="numbers">Numbers (0-9)</button>
+            <button class="learn-filter-btn" data-filter="punctuation">Punctuation</button>
+          </div>
+          <input type="text" id="learnSearchInput" class="learn-search-input" placeholder="Search letter or symbol...">
+        </div>
+
+        <!-- Cards Grid -->
+        <div class="learn-grid" id="learnCardsGrid"></div>
+      </section>
+
+      <!-- ====================================================================
+           TAB 5: PRACTICE & DYNAMIC QUIZ (CARD 4)
+           ==================================================================== -->
+      <section id="tab-practice" class="tab-pane">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title"><i class="fas fa-crosshairs"></i> Dynamic Practice & Quiz Arena</h2>
+            <p class="section-desc">Sharpen your Morse skills with infinite procedurally generated questions, smart distractors, audio tests, and interactive challenges.</p>
+          </div>
+          <div class="section-header-actions">
+            <button class="btn-icon-labeled open-help-modal-btn" data-guide="practice">
+              <i class="fas fa-question-circle"></i> Rules & Scoring
+            </button>
+          </div>
+        </div>
+
+        <div class="practice-container">
+          <!-- Sidebar: Config & Stats -->
+          <div class="practice-sidebar-card">
+            <div class="form-group">
+              <label for="practiceQuizMode"><i class="fas fa-gamepad"></i> Challenge Mode</label>
+              <select id="practiceQuizMode" class="form-control">
+                <option value="morse-to-text">Morse ➔ Character (MCQ)</option>
+                <option value="text-to-morse">Character ➔ Morse (MCQ)</option>
+                <option value="audio-to-text">Audio Tone ➔ Character</option>
+                <option value="interactive-tap">Interactive Tapping Box</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="practiceDifficulty"><i class="fas fa-layer-group"></i> Difficulty</label>
+              <select id="practiceDifficulty" class="form-control">
+                <option value="novice">Novice (Letters A-Z)</option>
+                <option value="adept">Adept (Letters & Numbers)</option>
+                <option value="master">Shadow Master (Words)</option>
+              </select>
+            </div>
+
+            <div class="rank-badge rank-novice" id="quizRankBadge">🔰 Novice Scout</div>
+
+            <div class="stats-group">
+              <div class="stat-item">
+                <span class="stat-label">Score</span>
+                <span class="stat-val" id="quizScoreVal">0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Streak</span>
+                <span class="stat-val" id="quizStreakVal">0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">High Score</span>
+                <span class="stat-val" id="quizHighScoreVal">0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Accuracy</span>
+                <span class="stat-val" id="quizAccuracyVal">100%</span>
+              </div>
+            </div>
+
+            <button id="startQuizBtn" class="btn-icon-labeled" style="width: 100%; justify-content: center; background: var(--primary); color: #fff;">
+              <i class="fas fa-rotate-right"></i> Restart Arena
+            </button>
+          </div>
+
+          <!-- Quiz Arena Card -->
+          <div class="quiz-main-card" id="quizQuestionContainer">
+            <div class="quiz-question-header">
+              <div class="quiz-subtitle" id="quizQuestionSubtitle">Identify the decoded character:</div>
+              <div class="quiz-prompt-box">
+                <div class="quiz-prompt-text" id="quizQuestionPrompt">...</div>
+                <button id="quizAudioPlayBtn" class="quiz-audio-play-btn" title="Replay Tone" style="display: none;">
+                  <i class="fas fa-volume-up"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Multiple Choice Grid -->
+            <div class="quiz-options-grid" id="quizOptionsGrid"></div>
+
+            <!-- Interactive Tapping Box Mode -->
+            <div class="interactive-tapping-container" id="quizInteractiveTappingBox" style="display: none;">
+              <div class="interactive-tap-buffer" id="quizInteractiveBuffer">Tap code here...</div>
+              <div class="interactive-tap-buttons">
+                <button class="quiz-tap-action-btn" id="quizTapDotBtn">Dot ( . )</button>
+                <button class="quiz-tap-action-btn" id="quizTapDashBtn">Dash ( - )</button>
+                <button class="quiz-tap-action-btn" id="quizTapSpaceBtn">Space ( / )</button>
+                <button class="quiz-tap-action-btn" id="quizTapClearBtn"><i class="fas fa-trash"></i></button>
+                <button class="quiz-tap-action-btn" id="quizTapSubmitBtn" style="background: var(--primary); color: #fff;">Submit Code</button>
+              </div>
+              <div class="interactive-feedback-row" id="quizInteractiveFeedback"></div>
+            </div>
+
+            <!-- Bottom Skip / Next Controls -->
+            <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+              <button id="skipQuestionBtn" class="btn-icon-labeled"><i class="fas fa-forward"></i> Skip</button>
+              <button id="nextQuestionBtn" class="btn-icon-labeled" style="background: var(--primary); color: #fff; display: none;">Next Question <i class="fas fa-arrow-right"></i></button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer & Royal / Solo Leveling Inscription -->
+    <footer class="main-footer">
+      <div class="container">
+        <div class="footer-content-grid">
+          <div class="footer-brand">
+            <h3><i class="fas fa-satellite-dish"></i> MorseCode-Typer</h3>
+            <p>A next-generation interactive Morse code environment featuring real-time translation, customizable mouse & keyboard keying boards, mnemonic learning aids, and procedural training.</p>
+          </div>
+
+          <div class="footer-motivation">
+            <div class="quote-box">
+              <span id="themeMotivationalQuote">&ldquo;ARISE. Conquer the darkness, awaken your shadow power, and rule the silent frequencies.&rdquo;</span>
+              <div class="quote-author" id="themeMotivationalAuthor">— The Shadow Monarch</div>
+            </div>
+          </div>
+
+          <div class="footer-feedback">
+            <h4>Feedback & Inquiries</h4>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 8px;">Created with passion. Send your thoughts or feature requests:</p>
+            <a href="mailto:kingofstates2239@gmail.com" class="feedback-email-link">
+              <i class="fas fa-envelope"></i> kingofstates2239@gmail.com
+            </a>
+          </div>
+        </div>
+
+        <div class="footer-bottom-row">
+          <div class="creator-morse-inscribed">
+            -.-. .-. . .- - . -.. / -... -.-- / - .... . / -.- .. -. --. / --- ..-. / ... - .- - . ...
+          </div>
+          <div class="creator-text-sub">
+            Created by the King of States &bull; All Rights Reserved
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ========================================================================
+       MODALS
+       ======================================================================== -->
+  
+  <!-- Mouse Settings Modal -->
+  <div id="mouseSettingsModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fas fa-sliders"></i> Mouse Typer Options</h3>
+        <button id="closeMouseSettingsBtn" class="modal-close-btn"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="mouseModeSelect">Input Method</label>
+          <select id="mouseModeSelect" class="form-control">
+            <option value="dual-click">Dual Click (Left = Dot, Right = Dash) [Recommended]</option>
+            <option value="single-click-timing">Single Click Timing (Short = Dot, Long = Dash)</option>
+            <option value="custom">Custom Button Assignments</option>
+          </select>
+        </div>
+
+        <div id="mouseSingleTimingGroup" style="display: none;">
+          <div class="form-group">
+            <label for="mouseSingleThreshInput">Long Press (Dash) Threshold (ms)</label>
+            <input type="number" id="mouseSingleThreshInput" class="form-control" value="200" min="100" max="600" step="20">
+          </div>
+        </div>
+
+        <div id="mouseCustomActionGroup" style="display: none;">
+          <div class="form-group">
+            <label for="mouseLeftAction">Left Click Action</label>
+            <select id="mouseLeftAction" class="form-control">
+              <option value="dot">Dot (.)</option>
+              <option value="dash">Dash (-)</option>
+              <option value="space">Letter / Word Break</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="mouseRightAction">Right Click Action</label>
+            <select id="mouseRightAction" class="form-control">
+              <option value="dash">Dash (-)</option>
+              <option value="dot">Dot (.)</option>
+              <option value="space">Letter / Word Break</option>
+              <option value="slash">Slash (/)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="mouseMiddleAction">Middle Click Action</label>
+            <select id="mouseMiddleAction" class="form-control">
+              <option value="space">Letter / Word Break</option>
+              <option value="slash">Slash (/)</option>
+              <option value="dot">Dot (.)</option>
+              <option value="dash">Dash (-)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="checkbox" id="mouseAutoCommitCheck" checked>
+            <span>Auto-commit character on silence gap</span>
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label for="mouseLetterTimeInput">Letter Pause Gap (ms to commit letter)</label>
+          <input type="number" id="mouseLetterTimeInput" class="form-control" value="750" min="300" max="2500" step="50">
+        </div>
+
+        <div class="form-group">
+          <label for="mouseWordTimeInput">Word Pause Gap (ms to add space)</label>
+          <input type="number" id="mouseWordTimeInput" class="form-control" value="1800" min="800" max="4500" step="100">
+        </div>
+
+        <hr style="margin: 16px 0; border-color: var(--border-color);">
+
+        <div class="form-group">
+          <label for="mouseFreqInput">Tone Pitch Frequency (Hz)</label>
+          <input type="range" id="mouseFreqInput" class="form-control" min="300" max="1200" step="20" value="700">
+        </div>
+
+        <div class="form-group">
+          <label for="mouseVolInput">Sound Volume (%)</label>
+          <input type="range" id="mouseVolInput" class="form-control" min="0" max="100" step="5" value="30">
+        </div>
+
+        <div class="form-group">
+          <label for="mouseWaveSelect">Oscillator Waveform</label>
+          <select id="mouseWaveSelect" class="form-control">
+            <option value="sine">Sine (Pure Tone)</option>
+            <option value="triangle">Triangle (Smooth Tone)</option>
+            <option value="square">Square (Retro Arcade Tone)</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="saveMouseSettingsBtn" class="btn-icon-labeled" style="background: var(--primary); color: #fff;">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Keyboard Settings Modal -->
+  <div id="keyboardSettingsModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fas fa-sliders"></i> Keyboard Keybinder & Options</h3>
+        <button id="closeKeyboardSettingsBtn" class="modal-close-btn"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="keyboardModeSelect">Keyboard Mode</label>
+          <select id="keyboardModeSelect" class="form-control">
+            <option value="single-key-timing">Single Key Timing (Tap = Dot, Hold = Dash) [Default: Spacebar]</option>
+            <option value="dual-key">Dual Key Mode (Key 1 = Dot, Key 2 = Dash)</option>
+            <option value="direct-char">Direct Characters (Type . and - and / directly)</option>
+          </select>
+        </div>
+
+        <!-- Single Key Timing Group -->
+        <div id="kbSingleTimingGroup">
+          <div class="form-group">
+            <label>Assigned Key for Dot/Dash</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" id="kbSingleKeyInput" class="form-control" value=" " readonly>
+              <button class="btn-icon-labeled key-record-btn" data-target="kbSingleKeyInput">Set Key</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="kbSingleThreshInput">Dash Hold Threshold (ms)</label>
+            <input type="number" id="kbSingleThreshInput" class="form-control" value="200" min="100" max="600" step="20">
+          </div>
+        </div>
+
+        <!-- Dual Key Group -->
+        <div id="kbDualKeyGroup" style="display: none;">
+          <div class="form-group">
+            <label>Dot (.) Key</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" id="kbDualDotInput" class="form-control" value="j" readonly>
+              <button class="btn-icon-labeled key-record-btn" data-target="kbDualDotInput">Set Key</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Dash (-) Key</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" id="kbDualDashInput" class="form-control" value="k" readonly>
+              <button class="btn-icon-labeled key-record-btn" data-target="kbDualDashInput">Set Key</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Word Space Key</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" id="kbDualSpaceInput" class="form-control" value=" " readonly>
+              <button class="btn-icon-labeled key-record-btn" data-target="kbDualSpaceInput">Set Key</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="checkbox" id="kbAutoCommitCheck" checked>
+            <span>Auto-commit character on silence gap</span>
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label for="kbLetterTimeInput">Letter Pause Gap (ms to commit letter)</label>
+          <input type="number" id="kbLetterTimeInput" class="form-control" value="750" min="300" max="2500" step="50">
+        </div>
+
+        <div class="form-group">
+          <label for="kbWordTimeInput">Word Pause Gap (ms to add space)</label>
+          <input type="number" id="kbWordTimeInput" class="form-control" value="1800" min="800" max="4500" step="100">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="saveKeyboardSettingsBtn" class="btn-icon-labeled" style="background: var(--primary); color: #fff;">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Learn Morse Full Mnemonic Chart Modal -->
+  <div id="mnemonicChartModal" class="modal-overlay">
+    <div class="modal-card wide-modal">
+      <div class="modal-header">
+        <h3><i class="fas fa-image"></i> Morse Code Visual Mnemonics Chart</h3>
+        <button id="closeChartModalBtn" class="modal-close-btn"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body chart-img-modal-body">
+        <img src="assets/morse-mnemonics.webp" alt="Morse Code Visual Mnemonics Chart" class="mnemonic-full-img">
+      </div>
+    </div>
+  </div>
+
+  <!-- Learn Letter Sandbox Modal -->
+  <div id="learnSandboxModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fas fa-hand-pointer"></i> Practice Letter <span id="sandboxTargetChar">A</span></h3>
+        <button id="closeSandboxBtn" class="modal-close-btn"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body" style="text-align: center;">
+        <div style="font-size: 14px; color: var(--text-muted); margin-bottom: 6px;">Target Morse Pattern:</div>
+        <div style="font-size: 32px; font-weight: 800; font-family: var(--font-mono); color: var(--primary); margin-bottom: 16px;" id="sandboxTargetMorse">.-</div>
+
+        <div class="interactive-tap-buffer" id="sandboxUserBuffer">Tap Dot or Dash below</div>
+
+        <div class="interactive-tap-buttons" style="margin-top: 16px;">
+          <button class="quiz-tap-action-btn" id="sandboxTapDot">Dot ( . )</button>
+          <button class="quiz-tap-action-btn" id="sandboxTapDash">Dash ( - )</button>
+          <button class="quiz-tap-action-btn" id="sandboxClear"><i class="fas fa-trash"></i></button>
+        </div>
+
+        <div class="interactive-feedback-row" id="sandboxFeedback" style="margin-top: 14px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Help Guide Modal -->
+  <div id="helpGuideModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="helpGuideTitle"><i class="fas fa-circle-question"></i> Help & User Guide</h3>
+        <button id="closeHelpModalBtn" class="modal-close-btn"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body" id="helpGuideBody"></div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/morse-core.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/translator.js"></script>
+  <script src="js/mouse-board.js"></script>
+  <script src="js/keyboard-board.js"></script>
+  <script src="js/learn.js"></script>
+  <script src="js/practice.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

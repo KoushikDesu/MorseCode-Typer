@@ -1,0 +1,142 @@
+/**
+ * MorseCode-Typer Themes & Shaders
+ * Dual Theme System:
+ * 1. Royal Sovereign (Light Mode): Clean royal blue & white regal aesthetics
+ * 2. Solo Leveling Shadow Monarch (Dark Mode): Abyssal black, electric mana cyan shaders & aura
+ */
+
+:root {
+  /* Common variables */
+  --font-main: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, 'Inter', Roboto, sans-serif;
+  --font-mono: 'Consolas', 'Fira Code', 'Courier New', monospace;
+  --transition-speed: 0.3s;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+}
+
+/* ==========================================================================
+   LIGHT THEME: "ROYAL SOVEREIGN" (Pleasant Blue & White)
+   ========================================================================== */
+:root[data-theme="light"] {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f1f5f9;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f8fafc;
+  --bg-input: #ffffff;
+  --bg-pad: #eff6ff;
+  --bg-pad-active: #dbeafe;
+
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+  --text-accent: #1d4ed8;
+
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --primary-glow: rgba(37, 99, 235, 0.25);
+  --primary-light: #eff6ff;
+
+  --secondary: #0284c7;
+  --accent-gold: #d97706;
+  --success: #16a34a;
+  --danger: #dc2626;
+  --warning: #ea580c;
+
+  --border-color: #e2e8f0;
+  --border-focus: #3b82f6;
+
+  --shadow-sm: 0 2px 4px rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 6px 16px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.12);
+  --shadow-neon: 0 0 20px rgba(37, 99, 235, 0.2);
+
+  --screen-vignette: radial-gradient(circle at center, transparent 70%, rgba(37, 99, 235, 0.04) 100%);
+  --screen-border-glow: inset 0 0 40px rgba(37, 99, 235, 0.08);
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(226, 232, 240, 0.8);
+}
+
+/* ==========================================================================
+   DARK THEME: "SOLO LEVELING / SHADOW MONARCH" (Obsidian Black & Mana Blue Shaders)
+   ========================================================================== */
+:root[data-theme="dark"] {
+  --bg-primary: #06080d;
+  --bg-secondary: #0c1017;
+  --bg-tertiary: #131924;
+  --bg-card: #0f1623;
+  --bg-card-hover: #162032;
+  --bg-input: #0a0e16;
+  --bg-pad: #0b1322;
+  --bg-pad-active: #10243e;
+
+  --text-primary: #f0f6fc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-accent: #00f0ff;
+
+  --primary: #00e5ff;
+  --primary-hover: #38bdf8;
+  --primary-glow: rgba(0, 240, 255, 0.45);
+  --primary-light: rgba(0, 240, 255, 0.1);
+
+  --secondary: #6366f1;
+  --accent-gold: #fbbf24;
+  --success: #10b981;
+  --danger: #f43f5e;
+  --warning: #f59e0b;
+
+  --border-color: #1e293b;
+  --border-focus: #00f0ff;
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.7);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.85);
+  --shadow-neon: 0 0 25px rgba(0, 240, 255, 0.35), 0 0 50px rgba(0, 240, 255, 0.15);
+
+  /* Solo Leveling Screen Perimeter Mana Shaders */
+  --screen-vignette: radial-gradient(ellipse at center, rgba(6, 8, 13, 0.2) 0%, rgba(3, 4, 8, 0.95) 100%);
+  --screen-border-glow: inset 0 0 80px rgba(0, 229, 255, 0.22), inset 0 0 180px rgba(99, 102, 241, 0.12);
+  --glass-bg: rgba(15, 22, 35, 0.75);
+  --glass-border: rgba(0, 240, 255, 0.25);
+}
+
+/* Ambient Mana Overlay around the whole screen in Dark Mode */
+.screen-mana-shader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 1;
+  box-shadow: var(--screen-border-glow);
+  background: var(--screen-vignette);
+  transition: box-shadow var(--transition-speed), background var(--transition-speed);
+}
+
+/* Subtle holographic scanline overlay for Dark Mode */
+[data-theme="dark"] .screen-mana-shader::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 240, 255, 0.02) 50%);
+  background-size: 100% 4px;
+  pointer-events: none;
+}
+
+/* Ambient Canvas Aura for particles */
+#manaAuraCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+}

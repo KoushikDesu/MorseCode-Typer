@@ -1,0 +1,93 @@
+/**
+ * Keyframes and Visual Animations
+ */
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px var(--primary-glow), inset 0 0 10px var(--primary-glow);
+    border-color: var(--primary);
+  }
+  50% {
+    box-shadow: 0 0 35px var(--primary-glow), 0 0 60px var(--primary-glow), inset 0 0 20px var(--primary-glow);
+    border-color: #38bdf8;
+  }
+}
+
+@keyframes manaVignettePulse {
+  0%, 100% {
+    opacity: 0.85;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes ditBeat {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.18); filter: brightness(1.4); }
+  100% { transform: scale(1); }
+}
+
+@keyframes dahBeat {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.22); filter: brightness(1.5); }
+  100% { transform: scale(1); }
+}
+
+@keyframes flashCommit {
+  0% { opacity: 0; transform: scale(0.5); }
+  40% { opacity: 1; transform: scale(1.25); filter: drop-shadow(0 0 20px var(--primary)); }
+  100% { opacity: 0; transform: scale(1.5); }
+}
+
+@keyframes rippleEffect {
+  0% {
+    width: 0px;
+    height: 0px;
+    opacity: 0.8;
+  }
+  100% {
+    width: 380px;
+    height: 380px;
+    opacity: 0;
+  }
+}
+
+@keyframes toastSlideIn {
+  0% { transform: translateY(30px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes modalFadeIn {
+  0% { opacity: 0; transform: scale(0.95) translateY(-10px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.playing-pulse {
+  animation: pulseGlow 1.4s infinite alternate ease-in-out;
+}
+
+.pulse-dot {
+  animation: ditBeat 0.18s ease-out;
+}
+
+.pulse-dash {
+  animation: dahBeat 0.25s ease-out;
+}
+
+.click-ripple {
+  position: absolute;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, var(--primary) 0%, rgba(0, 240, 255, 0.1) 70%, transparent 100%);
+  pointer-events: none;
+  animation: rippleEffect 0.55s ease-out forwards;
+}
+
+.flash-active {
+  animation: flashCommit 0.4s ease-out forwards !important;
+}
+
+.screen-mana-shader {
+  animation: manaVignettePulse 6s infinite alternate ease-in-out;
+}
