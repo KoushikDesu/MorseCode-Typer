@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f0ff" />
+      <stop offset="50%" stop-color="#2563eb" />
+      <stop offset="100%" stop-color="#7c3aed" />
+    </linearGradient>
+    
+    <!-- Neon Glow Filter -->
+    <filter id="neonGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="3.5" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <linearGradient id="crownGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24" />
+      <stop offset="100%" stop-color="#f59e0b" />
+    </linearGradient>
+  </defs>
+
+  <!-- Outer Rounded Shield -->
+  <rect x="6" y="6" width="108" height="108" rx="28" fill="#090d16" stroke="url(#shieldGrad)" stroke-width="4" filter="url(#neonGlow)" />
+
+  <!-- Inner Cyber Rings -->
+  <circle cx="60" cy="60" r="44" fill="none" stroke="rgba(0, 240, 255, 0.15)" stroke-width="1.5" stroke-dasharray="6, 4" />
+  <circle cx="60" cy="60" r="36" fill="none" stroke="rgba(37, 99, 235, 0.25)" stroke-width="1.5" />
+
+  <!-- Royal Crown Motif at top -->
+  <path d="M46 36 L52 44 L60 33 L68 44 L74 36 L72 49 L48 49 Z" fill="url(#crownGrad)" filter="url(#neonGlow)" />
+  <circle cx="60" cy="31" r="2.5" fill="#fef08a" />
+  <circle cx="46" cy="34" r="2" fill="#fef08a" />
+  <circle cx="74" cy="34" r="2" fill="#fef08a" />
+
+  <!-- Central Morse Telegraph Key / Signal Waves -->
+  <!-- Radiating Signal Arcs -->
+  <path d="M38 66 A26 26 0 0 1 82 66" fill="none" stroke="#00f0ff" stroke-width="3" stroke-linecap="round" opacity="0.9" />
+  <path d="M44 74 A18 18 0 0 1 76 74" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" opacity="0.8" />
+  
+  <!-- Morse Code Dit and Dah Symbols (• — •) below -->
+  <!-- Dit 1 -->
+  <circle cx="40" cy="88" r="4.5" fill="#00f0ff" filter="url(#neonGlow)" />
+  <!-- Dah 1 -->
+  <rect x="50" y="84" width="20" height="8" rx="4" fill="#fbbf24" filter="url(#neonGlow)" />
+  <!-- Dit 2 -->
+  <circle cx="80" cy="88" r="4.5" fill="#00f0ff" filter="url(#neonGlow)" />
+
+  <!-- Central Transmitter Core Node -->
+  <circle cx="60" cy="58" r="5" fill="#ffffff" filter="url(#neonGlow)" />
+  <circle cx="60" cy="58" r="8" fill="none" stroke="#00f0ff" stroke-width="2" />
+</svg>

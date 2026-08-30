@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MORSE CODE | King of States & Solo Leveling Edition</title>
+  <title>MORSE CODE TYPER | King of States & Solo Leveling Edition</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="css/themes.css">
   <link rel="stylesheet" href="css/animations.css">
@@ -19,12 +20,10 @@
     <header class="main-header">
       <div class="container header-inner">
         <div class="brand-section">
-          <div class="brand-icon">
-            <i class="fas fa-satellite-dish"></i>
-          </div>
+          <img src="assets/logo.svg" alt="Morse Code Typer Logo" class="brand-logo-img">
           <div class="brand-titles">
-            <h1 class="main-title">MORSE CODE</h1>
-            <div class="morse-sub-title">-- --- .-. ... . / -.-. --- -.. .</div>
+            <h1 class="main-title">MORSE CODE TYPER</h1>
+            <div class="morse-sub-title">-- --- .-. ... . / -.-. --- -.. . / - -.-- .--. . .-.</div>
           </div>
         </div>
 
@@ -171,7 +170,7 @@
               <div class="pad-instruction-icon"><i class="fas fa-hand-pointer"></i></div>
               <div class="pad-instruction-text">CLICK OR HOLD HERE TO TRANSMIT MORSE</div>
               <div class="pad-instruction-sub" id="mousePadInstructionHint">Left: DOT | Right: DASH | (/) = Break, (//) = Space</div>
-              <div class="live-key-hint">Customizable in Options: assign Dot, Dash, Break (/) & Hold to any button!</div>
+              <div class="live-key-hint">Customizable in Options: assign Dot, Dash, Break (/), Space (//) & Hold to any button!</div>
             </div>
           </div>
 
@@ -459,8 +458,8 @@
           <label for="mousePresetSelect"><i class="fas fa-wand-magic-sparkles"></i> Quick Setup Presets</label>
           <select id="mousePresetSelect" class="form-control">
             <option value="dual-click">Standard Dual Click: Left = Dot (.), Right = Dash (-), Middle = Break (/)</option>
-            <option value="single-button-right-hold">Single Button Timing: Right Click (Tap = Dot, Hold = Dash), Left Click = Break (/)</option>
-            <option value="single-button-left-hold">Single Button Timing: Left Click (Tap = Dot, Hold = Dash), Right Click = Break (/)</option>
+            <option value="single-button-right-hold">Single Button Timing: Right Click (Tap = Dot, Hold = Dash), Left Click = Break (/), Middle = Space (//)</option>
+            <option value="single-button-left-hold">Single Button Timing: Left Click (Tap = Dot, Hold = Dash), Right Click = Break (/), Middle = Space (//)</option>
           </select>
         </div>
 
@@ -476,6 +475,7 @@
                 <option value="dot">Dot ( . )</option>
                 <option value="dash">Dash ( - )</option>
                 <option value="slash">Letter Break ( / )</option>
+                <option value="double-slash">Word Space ( // )</option>
                 <option value="none">Disabled</option>
               </select>
             </div>
@@ -486,6 +486,7 @@
                 <option value="dash">Dash ( - )</option>
                 <option value="dot">Dot ( . )</option>
                 <option value="slash">Letter Break ( / )</option>
+                <option value="double-slash">Word Space ( // )</option>
               </select>
             </div>
           </div>
@@ -499,6 +500,7 @@
                 <option value="dash">Dash ( - )</option>
                 <option value="dot">Dot ( . )</option>
                 <option value="slash">Letter Break ( / )</option>
+                <option value="double-slash">Word Space ( // )</option>
                 <option value="none">Disabled</option>
               </select>
             </div>
@@ -509,6 +511,7 @@
                 <option value="dash">Dash ( - )</option>
                 <option value="dot">Dot ( . )</option>
                 <option value="slash">Letter Break ( / )</option>
+                <option value="double-slash">Word Space ( // )</option>
               </select>
             </div>
           </div>
@@ -522,6 +525,7 @@
               <label for="mouseMiddleSingle">Click Action</label>
               <select id="mouseMiddleSingle" class="form-control">
                 <option value="slash">Letter Break ( / )</option>
+                <option value="double-slash">Word Space ( // )</option>
                 <option value="dot">Dot ( . )</option>
                 <option value="dash">Dash ( - )</option>
                 <option value="none">Disabled</option>

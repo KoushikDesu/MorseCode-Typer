@@ -32,15 +32,15 @@ class MouseMorseBoardController {
       longPressThreshold: 200, // ms to trigger long press
 
       // Left Button
-      leftSingle: 'dot',       // 'dot', 'dash', 'slash', 'none'
-      leftLong: 'none',        // 'dash', 'dot', 'slash', 'none'
+      leftSingle: 'dot',       // 'dot', 'dash', 'slash', 'double-slash', 'none'
+      leftLong: 'none',        // 'dash', 'dot', 'slash', 'double-slash', 'none'
 
       // Right Button
-      rightSingle: 'dash',     // 'dash', 'dot', 'slash', 'none'
-      rightLong: 'none',       // 'dash', 'dot', 'slash', 'none'
+      rightSingle: 'dash',     // 'dash', 'dot', 'slash', 'double-slash', 'none'
+      rightLong: 'none',       // 'dash', 'dot', 'slash', 'double-slash', 'none'
 
       // Middle Button
-      middleSingle: 'slash',   // 'slash', 'dot', 'dash', 'none'
+      middleSingle: 'slash',   // 'slash', 'double-slash', 'dot', 'dash', 'none'
       middleLong: 'none',
 
       autoCommit: true,
@@ -66,7 +66,7 @@ class MouseMorseBoardController {
 
   loadSavedConfig() {
     try {
-      const saved = localStorage.getItem('morse_mouse_config_v2');
+      const saved = localStorage.getItem('morse_mouse_config_v3');
       if (saved) {
         this.config = Object.assign(this.config, JSON.parse(saved));
       }
@@ -75,7 +75,7 @@ class MouseMorseBoardController {
 
   saveConfig() {
     try {
-      localStorage.setItem('morse_mouse_config_v2', JSON.stringify(this.config));
+      localStorage.setItem('morse_mouse_config_v3', JSON.stringify(this.config));
     } catch (e) {}
   }
 
@@ -204,7 +204,6 @@ class MouseMorseBoardController {
 
     const isLongPress = duration >= this.config.longPressThreshold;
 
-    // Resolve Action based on Button and Duration
     let action = 'none';
 
     if (btn === 0) { // Left Click
@@ -231,10 +230,11 @@ class MouseMorseBoardController {
       this.consecutiveSlashes = 0;
     } else if (action === 'slash') {
       this.handleSlashAction();
-    } else if (action === 'space') {
+    } else if (action === 'double-slash' || action === 'space') {
       this.commitLetterNow();
       this.commitWordSpace();
       this.consecutiveSlashes = 0;
+      window.showToast('Word Space (//)', 'info');
     }
   }
 
@@ -245,12 +245,10 @@ class MouseMorseBoardController {
    */
   handleSlashAction() {
     if (this.currentMorseBuffer.length > 0) {
-      // Commits current letter
       this.commitLetterNow();
       this.consecutiveSlashes = 1;
       window.showToast('Letter Break (/)', 'info');
     } else if (this.consecutiveSlashes >= 1) {
-      // Double slash // creates a word space
       this.commitWordSpace();
       this.consecutiveSlashes = 0;
       window.showToast('Word Space (//)', 'info');
@@ -405,8 +403,16 @@ class MouseMorseBoardController {
 
   updatePadInstructionHint() {
     if (!this.padHint) return;
-    const lText = `Left: ${this.config.leftSingle.toUpperCase()}` + (this.config.leftLong !== 'none' ? ` (Hold: ${this.config.leftLong.toUpperCase()})` : '');
-    const rText = `Right: ${this.config.rightSingle.toUpperCase()}` + (this.config.rightLong !== 'none' ? ` (Hold: ${this.config.rightLong.toUpperCase()})` : '');
+    const formatAction = (act) => {
+      if (act === 'dot') return 'DOT (.)';
+      if (act === 'dash') return 'DASH (-)';
+      if (act === 'slash') return 'BREAK (/)';
+      if (act === 'double-slash' || act === 'space') return 'SPACE (//)';
+      return 'NONE';
+    };
+
+    const lText = `Left: ${formatAction(this.config.leftSingle)}` + (this.config.leftLong !== 'none' ? ` (Hold: ${formatAction(this.config.leftLong)})` : '');
+    const rText = `Right: ${formatAction(this.config.rightSingle)}` + (this.config.rightLong !== 'none' ? ` (Hold: ${formatAction(this.config.rightLong)})` : '');
     this.padHint.textContent = `${lText} | ${rText} | (/) = Break, (//) = Space`;
   }
 
@@ -448,26 +454,23 @@ class MouseMorseBoardController {
 
   applyPreset(presetName) {
     if (presetName === 'dual-click') {
-      // Left = Dot, Right = Dash, Middle = Slash
       document.getElementById('mouseLeftSingle').value = 'dot';
       document.getElementById('mouseLeftLong').value = 'none';
       document.getElementById('mouseRightSingle').value = 'dash';
       document.getElementById('mouseRightLong').value = 'none';
       document.getElementById('mouseMiddleSingle').value = 'slash';
     } else if (presetName === 'single-button-right-hold') {
-      // Right Click: Single = Dot, Long = Dash. Left Click = Slash (Break)
       document.getElementById('mouseLeftSingle').value = 'slash';
       document.getElementById('mouseLeftLong').value = 'none';
       document.getElementById('mouseRightSingle').value = 'dot';
       document.getElementById('mouseRightLong').value = 'dash';
-      document.getElementById('mouseMiddleSingle').value = 'slash';
+      document.getElementById('mouseMiddleSingle').value = 'double-slash';
     } else if (presetName === 'single-button-left-hold') {
-      // Left Click: Single = Dot, Long = Dash. Right Click = Slash (Break)
       document.getElementById('mouseLeftSingle').value = 'dot';
       document.getElementById('mouseLeftLong').value = 'dash';
       document.getElementById('mouseRightSingle').value = 'slash';
       document.getElementById('mouseRightLong').value = 'none';
-      document.getElementById('mouseMiddleSingle').value = 'slash';
+      document.getElementById('mouseMiddleSingle').value = 'double-slash';
     }
   }
 

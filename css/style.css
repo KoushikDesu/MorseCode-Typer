@@ -66,18 +66,18 @@ body {
   gap: 14px;
 }
 
-.brand-icon {
-  width: 46px;
-  height: 46px;
+.brand-logo-img {
+  width: 48px;
+  height: 48px;
   border-radius: var(--radius-md);
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-size: 20px;
   box-shadow: 0 4px 15px var(--primary-glow);
   flex-shrink: 0;
+  transition: transform 0.25s ease, filter 0.25s ease;
+  filter: drop-shadow(0 0 8px var(--primary-glow));
+}
+
+.brand-logo-img:hover {
+  transform: scale(1.08) rotate(-3deg);
 }
 
 .brand-titles {
