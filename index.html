@@ -93,7 +93,7 @@
                   <button id="copyTextBtn" class="box-action-btn" title="Copy Text"><i class="fas fa-copy"></i></button>
                 </div>
               </div>
-              <textarea id="translatorTextInput" class="translator-textarea" placeholder="Type plain English text here... (e.g. HELLO WORLD)"></textarea>
+              <textarea id="translatorTextInput" class="translator-textarea" placeholder="Type plain English text here... (e.g. WELCOME WARRIOR)">WELCOME WARRIOR</textarea>
             </div>
 
             <!-- Morse Code Input Box with Speaker Button -->
@@ -105,7 +105,7 @@
                   <button id="copyMorseBtn" class="box-action-btn" title="Copy Morse"><i class="fas fa-copy"></i></button>
                 </div>
               </div>
-              <textarea id="translatorMorseInput" class="translator-textarea morse-code-font" placeholder="Type Morse code here... (. = dot, - = dash, / = letter break, // = space)"></textarea>
+              <textarea id="translatorMorseInput" class="translator-textarea morse-code-font" placeholder="Type Morse code here... (. = dot, - = dash, / = letter break, // = space)">.-- . .-.. -.-. --- -- . / .-- .- .-. .-. .. --- .-.</textarea>
             </div>
           </div>
 
@@ -126,7 +126,7 @@
               </button>
             </div>
 
-            <div class="stats-badge" id="translatorStats">0 Characters | 0 Morse Signals</div>
+            <div class="stats-badge" id="translatorStats">15 Characters | 38 Morse Signals</div>
           </div>
         </div>
       </section>
@@ -138,11 +138,11 @@
         <div class="section-header">
           <div>
             <h2 class="section-title"><i class="fas fa-mouse"></i> Mouse Morse Typer</h2>
-            <p class="section-desc">Click on the board to transmit signals. Default: Left Click = Dot (.), Right Click = Dash (-). Pausing or clicking (/) commits the letter.</p>
+            <p class="section-desc">Click on the board to transmit signals. Single click or hold to transmit dots, dashes, and letter breaks (/).</p>
           </div>
           <div class="section-header-actions">
             <button id="openMouseSettingsBtn" class="btn-icon-labeled">
-              <i class="fas fa-sliders"></i> Input & Sound Options
+              <i class="fas fa-sliders"></i> Customize Buttons & Hold
             </button>
             <button class="btn-icon-labeled open-help-modal-btn" data-guide="mouse">
               <i class="fas fa-question-circle"></i> Instructions
@@ -169,9 +169,9 @@
             <!-- Interactive Mouse Clicking Pad -->
             <div id="mouseClickPad" class="interactive-pad-surface">
               <div class="pad-instruction-icon"><i class="fas fa-hand-pointer"></i></div>
-              <div class="pad-instruction-text">CLICK HERE TO TRANSMIT MORSE</div>
-              <div class="pad-instruction-sub">Left Click = Dot (•) &nbsp;|&nbsp; Right Click = Dash (—)</div>
-              <div class="live-key-hint">Middle Click / Pause: Commits Letter &bull; Double Slash (//) = Space</div>
+              <div class="pad-instruction-text">CLICK OR HOLD HERE TO TRANSMIT MORSE</div>
+              <div class="pad-instruction-sub" id="mousePadInstructionHint">Left: DOT | Right: DASH | (/) = Break, (//) = Space</div>
+              <div class="live-key-hint">Customizable in Options: assign Dot, Dash, Break (/) & Hold to any button!</div>
             </div>
           </div>
 
@@ -447,67 +447,99 @@
        MODALS
        ======================================================================== -->
   
-  <!-- Mouse Settings Modal -->
+  <!-- Mouse Settings Modal (Full Button & Hold Customizer) -->
   <div id="mouseSettingsModal" class="modal-overlay">
-    <div class="modal-card">
+    <div class="modal-card wide-modal">
       <div class="modal-header">
-        <h3><i class="fas fa-sliders"></i> Mouse Typer Options</h3>
+        <h3><i class="fas fa-sliders"></i> Customize Mouse Buttons & Hold Controls</h3>
         <button id="closeMouseSettingsBtn" class="modal-close-btn"><i class="fas fa-times"></i></button>
       </div>
       <div class="modal-body">
         <div class="form-group">
-          <label for="mouseModeSelect">Input Method</label>
-          <select id="mouseModeSelect" class="form-control">
-            <option value="dual-click">Dual Click (Left = Dot, Right = Dash, Middle = Break /) [Recommended]</option>
-            <option value="single-click-timing">Single Click Timing (Short = Dot, Long = Dash/Break)</option>
-            <option value="custom">Custom Button Assignments</option>
+          <label for="mousePresetSelect"><i class="fas fa-wand-magic-sparkles"></i> Quick Setup Presets</label>
+          <select id="mousePresetSelect" class="form-control">
+            <option value="dual-click">Standard Dual Click: Left = Dot (.), Right = Dash (-), Middle = Break (/)</option>
+            <option value="single-button-right-hold">Single Button Timing: Right Click (Tap = Dot, Hold = Dash), Left Click = Break (/)</option>
+            <option value="single-button-left-hold">Single Button Timing: Left Click (Tap = Dot, Hold = Dash), Right Click = Break (/)</option>
           </select>
         </div>
 
-        <div id="mouseSingleTimingGroup" style="display: none;">
-          <div class="form-group">
-            <label for="mouseSingleThreshInput">Long Press Threshold (ms)</label>
-            <input type="number" id="mouseSingleThreshInput" class="form-control" value="200" min="100" max="600" step="20">
+        <hr style="margin: 14px 0; border-color: var(--border-color);">
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <!-- Left Click Customizer -->
+          <div style="background: var(--bg-tertiary); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+            <h4 style="font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 10px;"><i class="fas fa-hand-pointer"></i> Left Mouse Button</h4>
+            <div class="form-group">
+              <label for="mouseLeftSingle">Single Click Action</label>
+              <select id="mouseLeftSingle" class="form-control">
+                <option value="dot">Dot ( . )</option>
+                <option value="dash">Dash ( - )</option>
+                <option value="slash">Letter Break ( / )</option>
+                <option value="none">Disabled</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="mouseLeftLong">Long Press (Hold) Action</label>
+              <select id="mouseLeftLong" class="form-control">
+                <option value="none">Same as Single Click</option>
+                <option value="dash">Dash ( - )</option>
+                <option value="dot">Dot ( . )</option>
+                <option value="slash">Letter Break ( / )</option>
+              </select>
+            </div>
           </div>
-          <div class="form-group">
-            <label for="mouseCustomLongPress">Long Press Action</label>
-            <select id="mouseCustomLongPress" class="form-control">
-              <option value="dash">Dash (-)</option>
-              <option value="slash">Letter Break (/)</option>
-              <option value="space">Word Space (//)</option>
-            </select>
+
+          <!-- Right Click Customizer -->
+          <div style="background: var(--bg-tertiary); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+            <h4 style="font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 10px;"><i class="fas fa-hand-pointer"></i> Right Mouse Button</h4>
+            <div class="form-group">
+              <label for="mouseRightSingle">Single Click Action</label>
+              <select id="mouseRightSingle" class="form-control">
+                <option value="dash">Dash ( - )</option>
+                <option value="dot">Dot ( . )</option>
+                <option value="slash">Letter Break ( / )</option>
+                <option value="none">Disabled</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="mouseRightLong">Long Press (Hold) Action</label>
+              <select id="mouseRightLong" class="form-control">
+                <option value="none">Same as Single Click</option>
+                <option value="dash">Dash ( - )</option>
+                <option value="dot">Dot ( . )</option>
+                <option value="slash">Letter Break ( / )</option>
+              </select>
+            </div>
           </div>
         </div>
 
-        <div id="mouseCustomActionGroup" style="display: none;">
-          <div class="form-group">
-            <label for="mouseLeftAction">Left Click Action</label>
-            <select id="mouseLeftAction" class="form-control">
-              <option value="dot">Dot (.)</option>
-              <option value="dash">Dash (-)</option>
-              <option value="slash">Letter Break (/)</option>
-              <option value="double-slash">Word Space (//)</option>
-            </select>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px;">
+          <!-- Middle Click Customizer -->
+          <div style="background: var(--bg-tertiary); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+            <h4 style="font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 10px;"><i class="fas fa-arrows-up-down"></i> Middle Button (Scroll Click)</h4>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="mouseMiddleSingle">Click Action</label>
+              <select id="mouseMiddleSingle" class="form-control">
+                <option value="slash">Letter Break ( / )</option>
+                <option value="dot">Dot ( . )</option>
+                <option value="dash">Dash ( - )</option>
+                <option value="none">Disabled</option>
+              </select>
+            </div>
           </div>
-          <div class="form-group">
-            <label for="mouseRightAction">Right Click Action</label>
-            <select id="mouseRightAction" class="form-control">
-              <option value="dash">Dash (-)</option>
-              <option value="dot">Dot (.)</option>
-              <option value="slash">Letter Break (/)</option>
-              <option value="double-slash">Word Space (//)</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="mouseMiddleAction">Middle Click Action</label>
-            <select id="mouseMiddleAction" class="form-control">
-              <option value="slash">Letter Break (/)</option>
-              <option value="double-slash">Word Space (//)</option>
-              <option value="dot">Dot (.)</option>
-              <option value="dash">Dash (-)</option>
-            </select>
+
+          <!-- Long Press Timing Threshold -->
+          <div style="background: var(--bg-tertiary); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+            <h4 style="font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 10px;"><i class="fas fa-stopwatch"></i> Hold Threshold</h4>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="mouseLongPressThreshInput">Long Press Duration (ms)</label>
+              <input type="number" id="mouseLongPressThreshInput" class="form-control" value="200" min="100" max="600" step="20">
+            </div>
           </div>
         </div>
+
+        <hr style="margin: 16px 0; border-color: var(--border-color);">
 
         <div class="form-group">
           <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
@@ -516,35 +548,34 @@
           </label>
         </div>
 
-        <div class="form-group">
-          <label for="mouseLetterTimeInput">Letter Pause Gap (ms to commit letter)</label>
-          <input type="number" id="mouseLetterTimeInput" class="form-control" value="750" min="300" max="2500" step="50">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="form-group">
+            <label for="mouseLetterTimeInput">Letter Pause Gap (ms to commit)</label>
+            <input type="number" id="mouseLetterTimeInput" class="form-control" value="750" min="300" max="2500" step="50">
+          </div>
+          <div class="form-group">
+            <label for="mouseWordTimeInput">Word Pause Gap (ms for space)</label>
+            <input type="number" id="mouseWordTimeInput" class="form-control" value="1800" min="800" max="4500" step="100">
+          </div>
         </div>
 
-        <div class="form-group">
-          <label for="mouseWordTimeInput">Word Pause Gap (ms to add space)</label>
-          <input type="number" id="mouseWordTimeInput" class="form-control" value="1800" min="800" max="4500" step="100">
-        </div>
-
-        <hr style="margin: 16px 0; border-color: var(--border-color);">
-
-        <div class="form-group">
-          <label for="mouseFreqInput">Tone Pitch Frequency (Hz)</label>
-          <input type="range" id="mouseFreqInput" class="form-control" min="300" max="1200" step="20" value="700">
-        </div>
-
-        <div class="form-group">
-          <label for="mouseVolInput">Sound Volume (%)</label>
-          <input type="range" id="mouseVolInput" class="form-control" min="0" max="100" step="5" value="30">
-        </div>
-
-        <div class="form-group">
-          <label for="mouseWaveSelect">Oscillator Waveform</label>
-          <select id="mouseWaveSelect" class="form-control">
-            <option value="sine">Sine (Pure Tone)</option>
-            <option value="triangle">Triangle (Smooth Tone)</option>
-            <option value="square">Square (Retro Arcade Tone)</option>
-          </select>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px;">
+          <div class="form-group">
+            <label for="mouseFreqInput">Pitch Frequency (Hz)</label>
+            <input type="range" id="mouseFreqInput" class="form-control" min="300" max="1200" step="20" value="700">
+          </div>
+          <div class="form-group">
+            <label for="mouseVolInput">Volume (%)</label>
+            <input type="range" id="mouseVolInput" class="form-control" min="0" max="100" step="5" value="30">
+          </div>
+          <div class="form-group">
+            <label for="mouseWaveSelect">Oscillator Waveform</label>
+            <select id="mouseWaveSelect" class="form-control">
+              <option value="sine">Sine</option>
+              <option value="triangle">Triangle</option>
+              <option value="square">Square</option>
+            </select>
+          </div>
         </div>
       </div>
       <div class="modal-footer">

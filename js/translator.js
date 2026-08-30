@@ -58,46 +58,48 @@ class MorseTranslatorController {
 
     // Play / Stop Audio Sequence from main button
     if (this.playBtn) {
-      this.playBtn.addEventListener('click', () => {
+      this.playBtn.addEventListener('click', (e) => {
+        e.preventDefault();
         this.togglePlayback();
       });
     }
 
     // Play Audio Sequence from the dedicated Morse Box Speaker Icon
     if (this.playMorseBoxBtn) {
-      this.playMorseBoxBtn.addEventListener('click', () => {
+      this.playMorseBoxBtn.addEventListener('click', (e) => {
+        e.preventDefault();
         this.togglePlayback();
       });
     }
 
     // Copy Text
     if (this.copyTextBtn) {
-      this.copyTextBtn.addEventListener('click', () => {
+      this.copyTextBtn.addEventListener('click', (e) => {
+        e.preventDefault();
         this.copyToClipboard(this.textInput.value, 'Text copied to clipboard!');
       });
     }
 
     // Copy Morse
     if (this.copyMorseBtn) {
-      this.copyMorseBtn.addEventListener('click', () => {
+      this.copyMorseBtn.addEventListener('click', (e) => {
+        e.preventDefault();
         this.copyToClipboard(this.morseInput.value, 'Morse code copied to clipboard!');
       });
     }
 
     // Clear Both
     if (this.clearBtn) {
-      this.clearBtn.addEventListener('click', () => {
-        this.stopPlayback();
-        this.textInput.value = '';
-        this.morseInput.value = '';
-        this.updateStats();
-        window.showToast('Translator cleared', 'info');
+      this.clearBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.clearTranslator();
       });
     }
 
     // Speak Text (Text-to-Speech)
     if (this.speakTextBtn) {
-      this.speakTextBtn.addEventListener('click', () => {
+      this.speakTextBtn.addEventListener('click', (e) => {
+        e.preventDefault();
         const text = this.textInput.value.trim();
         if (!text) {
           window.showToast('Nothing to speak', 'warning');
@@ -116,15 +118,29 @@ class MorseTranslatorController {
       });
     }
 
-    // Set Default Sample Text
-    this.textInput.value = 'HELLO WORLD';
-    this.morseInput.value = MorseCore.textToMorse('HELLO WORLD');
+    // Set Default Sample Text to 'WELCOME WARRIOR'
+    this.setDefaultText();
+  }
+
+  setDefaultText() {
+    const defaultText = 'WELCOME WARRIOR';
+    this.textInput.value = defaultText;
+    this.morseInput.value = MorseCore.textToMorse(defaultText);
     this.updateStats();
   }
 
+  clearTranslator() {
+    this.stopPlayback();
+    this.textInput.value = '';
+    this.morseInput.value = '';
+    this.updateStats();
+    this.textInput.focus();
+    window.showToast('Translator cleared', 'info');
+  }
+
   updateStats() {
-    const textChars = this.textInput.value.length;
-    const morseSymbols = this.morseInput.value.replace(/\s+/g, '').length;
+    const textChars = this.textInput ? this.textInput.value.length : 0;
+    const morseSymbols = this.morseInput ? this.morseInput.value.replace(/\s+/g, '').length : 0;
     const statsElem = document.getElementById('translatorStats');
     if (statsElem) {
       statsElem.textContent = `${textChars} Characters | ${morseSymbols} Morse Signals`;
