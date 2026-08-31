@@ -1,6 +1,6 @@
 /**
  * Morse Code Floating Typer - Content Script
- * Direct Input Injection, Draggable Floating Widget, Web Audio, and Mobile Support
+ * Direct Input Injection, Saved Cursor Tracker, Master Power Switch, Web Audio, and Mobile Support
  */
 
 (function () {
@@ -93,6 +93,7 @@
   // Extension Controller
   class MorseFloatingTyper {
     constructor() {
+      this.isEnabled = true;
       this.isOpen = false;
       this.isUppercase = true;
       this.theme = 'dark';
@@ -103,6 +104,7 @@
       this.pressStartTime = 0;
       this.isMouseDown = false;
       this.activeTargetElement = null;
+      this.savedCursorPos = null;
 
       // Settings
       this.config = {
@@ -122,12 +124,15 @@
       this.loadSettings();
       this.initDom();
       this.attachGlobalListeners();
+      this.initPowerState();
     }
 
     loadSettings() {
       try {
         const saved = localStorage.getItem('morse_ext_config_v4');
         if (saved) Object.assign(this.config, JSON.parse(saved));
+        const power = localStorage.getItem('morse_power_enabled');
+        if (power !== null) this.isEnabled = (power !== 'false');
       } catch (e) {}
     }
 
@@ -135,6 +140,41 @@
       try {
         localStorage.setItem('morse_ext_config_v4', JSON.stringify(this.config));
       } catch (e) {}
+    }
+
+    initPowerState() {
+      if (chrome && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.get(['morse_power_enabled'], (res) => {
+          if (res.morse_power_enabled !== undefined) {
+            this.setPowerState(res.morse_power_enabled);
+          }
+        });
+      }
+
+      // Listen to runtime messages from popup
+      if (chrome && chrome.runtime && chrome.runtime.onMessage) {
+        chrome.runtime.onMessage.addListener((msg) => {
+          if (msg.action === 'toggle_power') {
+            this.setPowerState(msg.enabled);
+          }
+        });
+      }
+
+      this.setPowerState(this.isEnabled);
+    }
+
+    setPowerState(enabled) {
+      this.isEnabled = enabled;
+      localStorage.setItem('morse_power_enabled', enabled ? 'true' : 'false');
+      if (!enabled) {
+        if (this.ball) this.ball.style.display = 'none';
+        if (this.widget) this.widget.classList.remove('mext-open');
+        this.isOpen = false;
+      } else {
+        if (!this.isOpen && this.ball) {
+          this.ball.style.display = 'flex';
+        }
+      }
     }
 
     initDom() {
@@ -164,6 +204,7 @@
             <button class="mext-btn-icon" id="mextCaseToggle" title="Toggle UPPERCASE / lowercase">a/A</button>
             <button class="mext-btn-icon" id="mextSoundToggle" title="Toggle Sound">🔊</button>
             <button class="mext-btn-icon" id="mextSettingsToggle" title="Settings & Keybindings">⚙️</button>
+            <button class="mext-btn-icon" id="mextPowerOffBtn" title="Turn OFF Floating Assistant" style="color: #ef4444;">⏻</button>
             <button class="mext-btn-icon" id="mextCloseBtn" title="Collapse into Ball">✕</button>
           </div>
         </div>
@@ -297,6 +338,14 @@
       // Close button -> Collapse to ball
       this.widget.querySelector('#mextCloseBtn').addEventListener('click', () => {
         this.closeWidget();
+      });
+
+      // Power Off Button in Header -> Turn off floating assistant
+      this.widget.querySelector('#mextPowerOffBtn').addEventListener('click', () => {
+        this.setPowerState(false);
+        if (chrome && chrome.storage && chrome.storage.local) {
+          chrome.storage.local.set({ morse_power_enabled: false });
+        }
       });
 
       // Case Toggle (A/a)
@@ -449,12 +498,14 @@
 
     closeWidget() {
       this.widget.classList.remove('mext-open');
-      this.ball.style.display = 'flex';
+      if (this.isEnabled) {
+        this.ball.style.display = 'flex';
+      }
       this.isOpen = false;
     }
 
     attachGlobalListeners() {
-      // Track currently focused active text element
+      // Track currently focused active text element & cursor position
       const trackFocus = (e) => {
         const target = e.target;
         if (!target) return;
@@ -464,14 +515,30 @@
         const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
         if (isInput) {
           this.activeTargetElement = target;
+          if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+            const pos = typeof target.selectionStart === 'number' ? target.selectionStart : target.value.length;
+            this.savedCursorPos = pos;
+          }
           const name = target.getAttribute('placeholder') || target.getAttribute('name') || target.tagName.toLowerCase();
           const lbl = this.widget.querySelector('#mextTargetLabel');
           if (lbl) lbl.textContent = `Target: <${name.slice(0, 18)}>`;
         }
       };
 
+      const trackCursor = (e) => {
+        const target = e.target;
+        if (!target) return;
+        if (target === this.activeTargetElement && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) {
+          if (typeof target.selectionStart === 'number') {
+            this.savedCursorPos = target.selectionStart;
+          }
+        }
+      };
+
       document.addEventListener('focusin', trackFocus, true);
       document.addEventListener('click', trackFocus, true);
+      document.addEventListener('keyup', trackCursor, true);
+      document.addEventListener('mouseup', trackCursor, true);
     }
 
     handlePadDown(e) {
@@ -615,16 +682,23 @@
 
       try {
         if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-          if (typeof el.setRangeText === 'function') {
-            const start = el.selectionStart ?? el.value.length;
-            const end = el.selectionEnd ?? el.value.length;
-            el.setRangeText(text, start, end, 'end');
-          } else {
-            const start = el.selectionStart || el.value.length;
-            const end = el.selectionEnd || el.value.length;
-            el.value = el.value.slice(0, start) + text + el.value.slice(end);
-            el.selectionStart = el.selectionEnd = start + text.length;
+          const val = el.value || '';
+          let pos = (typeof this.savedCursorPos === 'number') ? this.savedCursorPos : val.length;
+          if (pos > val.length) pos = val.length;
+          if (pos < 0) pos = 0;
+
+          // If active element is focused and has valid selectionStart
+          if (document.activeElement === el && typeof el.selectionStart === 'number') {
+            pos = el.selectionStart;
           }
+
+          el.value = val.slice(0, pos) + text + val.slice(pos);
+          this.savedCursorPos = pos + text.length;
+
+          try {
+            el.selectionStart = el.selectionEnd = this.savedCursorPos;
+          } catch (err) {}
+
           el.dispatchEvent(new Event('input', { bubbles: true }));
           el.dispatchEvent(new Event('change', { bubbles: true }));
         } else if (el.isContentEditable) {
@@ -642,29 +716,28 @@
         return;
       }
 
-      // 2. Else delete previous character in active text field
+      // 2. Else delete previous character in active text field at saved cursor pos
       const el = this.activeTargetElement || document.activeElement;
       if (!el || el === document.body) return;
 
       try {
         if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-          const start = el.selectionStart;
-          const end = el.selectionEnd;
-          if (start === end && start > 0) {
-            if (typeof el.setRangeText === 'function') {
-              el.setRangeText('', start - 1, start, 'end');
-            } else {
-              el.value = el.value.slice(0, start - 1) + el.value.slice(start);
-              el.selectionStart = el.selectionEnd = start - 1;
-            }
-          } else if (start !== end) {
-            if (typeof el.setRangeText === 'function') {
-              el.setRangeText('', start, end, 'end');
-            } else {
-              el.value = el.value.slice(0, start) + el.value.slice(end);
-              el.selectionStart = el.selectionEnd = start;
-            }
+          const val = el.value || '';
+          let pos = (typeof this.savedCursorPos === 'number') ? this.savedCursorPos : val.length;
+          if (pos > val.length) pos = val.length;
+          if (pos <= 0) return;
+
+          if (document.activeElement === el && typeof el.selectionStart === 'number' && el.selectionStart > 0) {
+            pos = el.selectionStart;
           }
+
+          el.value = val.slice(0, pos - 1) + val.slice(pos);
+          this.savedCursorPos = pos - 1;
+
+          try {
+            el.selectionStart = el.selectionEnd = this.savedCursorPos;
+          } catch (err) {}
+
           el.dispatchEvent(new Event('input', { bubbles: true }));
           el.dispatchEvent(new Event('change', { bubbles: true }));
         } else if (el.isContentEditable) {
