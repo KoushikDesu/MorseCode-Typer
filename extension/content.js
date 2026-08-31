@@ -112,8 +112,8 @@
         rightLong: 'none',
         middleSingle: 'slash',
         longPressThreshold: 200,
-        autoCommit: true,
-        autoSpace: true,
+        autoCommit: true,       // Auto Character Break on silence gap
+        autoSpace: true,        // Auto Word Space on silence gap
         letterTimeout: 750,
         wordTimeout: 1800,
         soundEnabled: true
@@ -126,14 +126,14 @@
 
     loadSettings() {
       try {
-        const saved = localStorage.getItem('morse_ext_config');
+        const saved = localStorage.getItem('morse_ext_config_v4');
         if (saved) Object.assign(this.config, JSON.parse(saved));
       } catch (e) {}
     }
 
     saveSettings() {
       try {
-        localStorage.setItem('morse_ext_config', JSON.stringify(this.config));
+        localStorage.setItem('morse_ext_config_v4', JSON.stringify(this.config));
       } catch (e) {}
     }
 
@@ -163,8 +163,7 @@
           <div class="mext-header-actions">
             <button class="mext-btn-icon" id="mextCaseToggle" title="Toggle UPPERCASE / lowercase">a/A</button>
             <button class="mext-btn-icon" id="mextSoundToggle" title="Toggle Sound">🔊</button>
-            <button class="mext-btn-icon" id="mextHideKbToggle" title="Hide Mobile OS Keyboard">⌨️</button>
-            <button class="mext-btn-icon" id="mextSettingsToggle" title="Settings">⚙️</button>
+            <button class="mext-btn-icon" id="mextSettingsToggle" title="Settings & Keybindings">⚙️</button>
             <button class="mext-btn-icon" id="mextCloseBtn" title="Collapse into Ball">✕</button>
           </div>
         </div>
@@ -191,46 +190,90 @@
         </div>
 
         <div class="mext-toolbar">
-          <button class="mext-btn" id="mextBtnDot">Dot (•)</button>
-          <button class="mext-btn" id="mextBtnDash">Dash (—)</button>
-          <button class="mext-btn" id="mextBtnSlash">Break (/)</button>
-          <button class="mext-btn" id="mextBtnSpace">Space (//)</button>
-          <button class="mext-btn" id="mextBtnBack">⌫</button>
-          <button class="mext-btn" id="mextBtnClear">🗑</button>
+          <button class="mext-btn" id="mextBtnDot" type="button">Dot (•)</button>
+          <button class="mext-btn" id="mextBtnDash" type="button">Dash (—)</button>
+          <button class="mext-btn" id="mextBtnSlash" type="button">Break (/)</button>
+          <button class="mext-btn" id="mextBtnSpace" type="button">Space (//)</button>
+          <button class="mext-btn" id="mextBtnBack" type="button">⌫</button>
+          <button class="mext-btn" id="mextBtnClear" type="button">🗑</button>
         </div>
 
-        <!-- Inline Settings Drawer -->
+        <!-- Full Inline Settings Drawer -->
         <div class="mext-settings-drawer" id="mextSettingsDrawer">
-          <div class="mext-form-group">
-            <label>Left Click Action</label>
-            <select class="mext-select" id="mextOptLeftSingle">
-              <option value="dot">Dot (.)</option>
-              <option value="dash">Dash (-)</option>
-              <option value="slash">Letter Break (/)</option>
-              <option value="double-slash">Word Space (//)</option>
-            </select>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <div class="mext-form-group">
+              <label>Left Single Click</label>
+              <select class="mext-select" id="mextOptLeftSingle">
+                <option value="dot">Dot (.)</option>
+                <option value="dash">Dash (-)</option>
+                <option value="slash">Letter Break (/)</option>
+                <option value="double-slash">Word Space (//)</option>
+                <option value="none">Disabled</option>
+              </select>
+            </div>
+            <div class="mext-form-group">
+              <label>Left Long Press</label>
+              <select class="mext-select" id="mextOptLeftLong">
+                <option value="none">Same as Click</option>
+                <option value="dash">Dash (-)</option>
+                <option value="dot">Dot (.)</option>
+                <option value="slash">Letter Break (/)</option>
+                <option value="double-slash">Word Space (//)</option>
+              </select>
+            </div>
           </div>
-          <div class="mext-form-group">
-            <label>Right Click Action</label>
-            <select class="mext-select" id="mextOptRightSingle">
-              <option value="dash">Dash (-)</option>
-              <option value="dot">Dot (.)</option>
-              <option value="slash">Letter Break (/)</option>
-              <option value="double-slash">Word Space (//)</option>
-            </select>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <div class="mext-form-group">
+              <label>Right Single Click</label>
+              <select class="mext-select" id="mextOptRightSingle">
+                <option value="dash">Dash (-)</option>
+                <option value="dot">Dot (.)</option>
+                <option value="slash">Letter Break (/)</option>
+                <option value="double-slash">Word Space (//)</option>
+                <option value="none">Disabled</option>
+              </select>
+            </div>
+            <div class="mext-form-group">
+              <label>Right Long Press</label>
+              <select class="mext-select" id="mextOptRightLong">
+                <option value="none">Same as Click</option>
+                <option value="dash">Dash (-)</option>
+                <option value="dot">Dot (.)</option>
+                <option value="slash">Letter Break (/)</option>
+                <option value="double-slash">Word Space (//)</option>
+              </select>
+            </div>
           </div>
-          <div class="mext-form-group">
-            <label>Long Press Hold (Right/Left)</label>
-            <select class="mext-select" id="mextOptRightLong">
-              <option value="none">Disabled (Same as click)</option>
-              <option value="dash">Dash (-)</option>
-              <option value="slash">Letter Break (/)</option>
-              <option value="double-slash">Word Space (//)</option>
-            </select>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <div class="mext-form-group">
+              <label>Middle Click Action</label>
+              <select class="mext-select" id="mextOptMiddleSingle">
+                <option value="slash">Letter Break (/)</option>
+                <option value="double-slash">Word Space (//)</option>
+                <option value="dot">Dot (.)</option>
+                <option value="dash">Dash (-)</option>
+                <option value="none">Disabled</option>
+              </select>
+            </div>
+            <div class="mext-form-group">
+              <label>Hold Duration (ms)</label>
+              <input type="number" class="mext-input" id="mextOptHoldThresh" value="200" min="100" max="600" step="20">
+            </div>
           </div>
+
+          <div class="mext-form-group" style="margin-top: 4px;">
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; color: var(--mext-text); font-weight: 600;">
+              <input type="checkbox" id="mextOptAutoCommit" checked>
+              <span>Auto character break on silence gap</span>
+            </label>
+          </div>
+
           <div class="mext-form-group">
-            <label>
-              <input type="checkbox" id="mextOptAutoSpace" checked> Auto-space on pause (Disable if manual space assigned)
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; color: var(--mext-text); font-weight: 600;">
+              <input type="checkbox" id="mextOptAutoSpace" checked>
+              <span>Auto word space on pause gap</span>
             </label>
           </div>
         </div>
@@ -271,19 +314,6 @@
         this.widget.querySelector('#mextSoundToggle').textContent = audioSynth.muted ? '🔇' : '🔊';
       });
 
-      // Hide Mobile OS Keyboard Toggle
-      this.widget.querySelector('#mextHideKbToggle').addEventListener('click', () => {
-        if (this.activeTargetElement) {
-          if (this.activeTargetElement.inputMode === 'none') {
-            this.activeTargetElement.inputMode = 'text';
-            this.widget.querySelector('#mextHideKbToggle').classList.remove('mext-active');
-          } else {
-            this.activeTargetElement.inputMode = 'none';
-            this.widget.querySelector('#mextHideKbToggle').classList.add('mext-active');
-          }
-        }
-      });
-
       // Settings Drawer Toggle
       this.widget.querySelector('#mextSettingsToggle').addEventListener('click', () => {
         const drawer = this.widget.querySelector('#mextSettingsDrawer');
@@ -299,36 +329,52 @@
       pad.addEventListener('mouseup', (e) => this.handlePadUp(e));
       pad.addEventListener('touchstart', (e) => {
         e.preventDefault();
-        this.handlePadDown({ button: 0 });
+        const touch = e.touches[0];
+        const rect = pad.getBoundingClientRect();
+        const relativeX = touch.clientX - rect.left;
+        const btnId = (relativeX > rect.width * 0.6) ? 2 : 0;
+        this.handlePadDown({ button: btnId });
       }, { passive: false });
       pad.addEventListener('touchend', (e) => {
         e.preventDefault();
-        this.handlePadUp({ button: 0 });
+        this.handlePadUp({ button: this.activePadButton || 0 });
       }, { passive: false });
 
-      // Quick Toolbar buttons
-      this.widget.querySelector('#mextBtnDot').addEventListener('click', () => {
+      // Quick Toolbar buttons (reliably handle insertion & active target)
+      this.widget.querySelector('#mextBtnDot').addEventListener('click', (e) => {
+        e.preventDefault();
         this.appendSymbol('.');
         audioSynth.playDit();
         if (this.config.autoCommit) this.startCommitTimer();
       });
-      this.widget.querySelector('#mextBtnDash').addEventListener('click', () => {
+
+      this.widget.querySelector('#mextBtnDash').addEventListener('click', (e) => {
+        e.preventDefault();
         this.appendSymbol('-');
         audioSynth.playDah();
         if (this.config.autoCommit) this.startCommitTimer();
       });
-      this.widget.querySelector('#mextBtnSlash').addEventListener('click', () => {
+
+      this.widget.querySelector('#mextBtnSlash').addEventListener('click', (e) => {
+        e.preventDefault();
         this.handleSlashAction();
       });
-      this.widget.querySelector('#mextBtnSpace').addEventListener('click', () => {
+
+      this.widget.querySelector('#mextBtnSpace').addEventListener('click', (e) => {
+        e.preventDefault();
         this.commitLetterNow();
         this.insertTextToTarget(' ');
       });
-      this.widget.querySelector('#mextBtnBack').addEventListener('click', () => {
+
+      this.widget.querySelector('#mextBtnBack').addEventListener('click', (e) => {
+        e.preventDefault();
         this.handleBackspace();
       });
-      this.widget.querySelector('#mextBtnClear').addEventListener('click', () => {
+
+      this.widget.querySelector('#mextBtnClear').addEventListener('click', (e) => {
+        e.preventDefault();
         this.currentBuffer = '';
+        this.consecutiveSlashes = 0;
         this.updateBufferUI();
       });
 
@@ -336,13 +382,33 @@
       this.widget.querySelector('#mextOptLeftSingle').addEventListener('change', (e) => {
         this.config.leftSingle = e.target.value;
         this.saveSettings();
+        this.updatePadHint();
+      });
+      this.widget.querySelector('#mextOptLeftLong').addEventListener('change', (e) => {
+        this.config.leftLong = e.target.value;
+        this.saveSettings();
+        this.updatePadHint();
       });
       this.widget.querySelector('#mextOptRightSingle').addEventListener('change', (e) => {
         this.config.rightSingle = e.target.value;
         this.saveSettings();
+        this.updatePadHint();
       });
       this.widget.querySelector('#mextOptRightLong').addEventListener('change', (e) => {
         this.config.rightLong = e.target.value;
+        this.saveSettings();
+        this.updatePadHint();
+      });
+      this.widget.querySelector('#mextOptMiddleSingle').addEventListener('change', (e) => {
+        this.config.middleSingle = e.target.value;
+        this.saveSettings();
+      });
+      this.widget.querySelector('#mextOptHoldThresh').addEventListener('change', (e) => {
+        this.config.longPressThreshold = parseInt(e.target.value, 10) || 200;
+        this.saveSettings();
+      });
+      this.widget.querySelector('#mextOptAutoCommit').addEventListener('change', (e) => {
+        this.config.autoCommit = e.target.checked;
         this.saveSettings();
       });
       this.widget.querySelector('#mextOptAutoSpace').addEventListener('change', (e) => {
@@ -353,9 +419,26 @@
 
     populateSettings() {
       this.widget.querySelector('#mextOptLeftSingle').value = this.config.leftSingle;
+      this.widget.querySelector('#mextOptLeftLong').value = this.config.leftLong;
       this.widget.querySelector('#mextOptRightSingle').value = this.config.rightSingle;
       this.widget.querySelector('#mextOptRightLong').value = this.config.rightLong;
+      this.widget.querySelector('#mextOptMiddleSingle').value = this.config.middleSingle;
+      this.widget.querySelector('#mextOptHoldThresh').value = this.config.longPressThreshold;
+      this.widget.querySelector('#mextOptAutoCommit').checked = this.config.autoCommit;
       this.widget.querySelector('#mextOptAutoSpace').checked = this.config.autoSpace;
+    }
+
+    updatePadHint() {
+      const hint = this.widget.querySelector('#mextPadSub');
+      if (!hint) return;
+      const fmt = (act) => {
+        if (act === 'dot') return 'DOT';
+        if (act === 'dash') return 'DASH';
+        if (act === 'slash') return 'BREAK (/)';
+        if (act === 'double-slash') return 'SPACE (//)';
+        return 'OFF';
+      };
+      hint.textContent = `Left: ${fmt(this.config.leftSingle)} | Right: ${fmt(this.config.rightSingle)} | (/) Break, (//) Space`;
     }
 
     openWidget() {
@@ -375,7 +458,7 @@
       const trackFocus = (e) => {
         const target = e.target;
         if (!target) return;
-        // Ignore clicks inside our own widget
+        // Ignore clicks inside our own widget or ball
         if (this.widget.contains(target) || this.ball.contains(target)) return;
 
         const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
@@ -383,7 +466,7 @@
           this.activeTargetElement = target;
           const name = target.getAttribute('placeholder') || target.getAttribute('name') || target.tagName.toLowerCase();
           const lbl = this.widget.querySelector('#mextTargetLabel');
-          if (lbl) lbl.textContent = `Target: <${name}>`;
+          if (lbl) lbl.textContent = `Target: <${name.slice(0, 18)}>`;
         }
       };
 
@@ -393,6 +476,7 @@
 
     handlePadDown(e) {
       this.isMouseDown = true;
+      this.activePadButton = e.button !== undefined ? e.button : 0;
       this.pressStartTime = Date.now();
       this.clearTimers();
       this.widget.querySelector('#mextClickPad').classList.add('mext-pressed');
@@ -406,15 +490,15 @@
       this.widget.querySelector('#mextClickPad').classList.remove('mext-pressed');
       audioSynth.stopTone();
 
-      const btn = e.button !== undefined ? e.button : 0;
+      const btn = e.button !== undefined ? e.button : this.activePadButton;
       const isLong = duration >= this.config.longPressThreshold;
 
       let action = 'dot';
-      if (btn === 0) {
+      if (btn === 0) { // Left Click
         action = isLong && this.config.leftLong !== 'none' ? this.config.leftLong : this.config.leftSingle;
-      } else if (btn === 2) {
+      } else if (btn === 2) { // Right Click
         action = isLong && this.config.rightLong !== 'none' ? this.config.rightLong : this.config.rightSingle;
-      } else if (btn === 1) {
+      } else if (btn === 1) { // Middle Click
         action = this.config.middleSingle;
       }
 
@@ -471,10 +555,12 @@
 
     startCommitTimer() {
       this.clearTimers();
+      if (!this.config.autoCommit) return;
+
       this.letterTimer = setTimeout(() => {
         this.commitLetterNow();
 
-        // Only auto space if enabled and not disabled by manual space preference
+        // Only auto space if enabled
         if (this.config.autoSpace) {
           this.wordTimer = setTimeout(() => {
             this.insertTextToTarget(' ');
@@ -527,38 +613,65 @@
         return;
       }
 
-      if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-        const start = el.selectionStart || el.value.length;
-        const end = el.selectionEnd || el.value.length;
-        el.value = el.value.slice(0, start) + text + el.value.slice(end);
-        el.selectionStart = el.selectionEnd = start + text.length;
-        el.dispatchEvent(new Event('input', { bubbles: true }));
-        el.dispatchEvent(new Event('change', { bubbles: true }));
-      } else if (el.isContentEditable) {
-        document.execCommand('insertText', false, text);
-      }
+      try {
+        if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+          if (typeof el.setRangeText === 'function') {
+            const start = el.selectionStart ?? el.value.length;
+            const end = el.selectionEnd ?? el.value.length;
+            el.setRangeText(text, start, end, 'end');
+          } else {
+            const start = el.selectionStart || el.value.length;
+            const end = el.selectionEnd || el.value.length;
+            el.value = el.value.slice(0, start) + text + el.value.slice(end);
+            el.selectionStart = el.selectionEnd = start + text.length;
+          }
+          el.dispatchEvent(new Event('input', { bubbles: true }));
+          el.dispatchEvent(new Event('change', { bubbles: true }));
+        } else if (el.isContentEditable) {
+          el.focus();
+          document.execCommand('insertText', false, text);
+        }
+      } catch (e) {}
     }
 
     handleBackspace() {
+      // 1. If Morse symbol buffer has symbols, delete last dot/dash
       if (this.currentBuffer.length > 0) {
         this.currentBuffer = this.currentBuffer.slice(0, -1);
         this.updateBufferUI();
         return;
       }
 
+      // 2. Else delete previous character in active text field
       const el = this.activeTargetElement || document.activeElement;
-      if (!el) return;
+      if (!el || el === document.body) return;
 
-      if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-        const start = el.selectionStart;
-        if (start > 0) {
-          el.value = el.value.slice(0, start - 1) + el.value.slice(start);
-          el.selectionStart = el.selectionEnd = start - 1;
+      try {
+        if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+          const start = el.selectionStart;
+          const end = el.selectionEnd;
+          if (start === end && start > 0) {
+            if (typeof el.setRangeText === 'function') {
+              el.setRangeText('', start - 1, start, 'end');
+            } else {
+              el.value = el.value.slice(0, start - 1) + el.value.slice(start);
+              el.selectionStart = el.selectionEnd = start - 1;
+            }
+          } else if (start !== end) {
+            if (typeof el.setRangeText === 'function') {
+              el.setRangeText('', start, end, 'end');
+            } else {
+              el.value = el.value.slice(0, start) + el.value.slice(end);
+              el.selectionStart = el.selectionEnd = start;
+            }
+          }
           el.dispatchEvent(new Event('input', { bubbles: true }));
+          el.dispatchEvent(new Event('change', { bubbles: true }));
+        } else if (el.isContentEditable) {
+          el.focus();
+          document.execCommand('delete', false, null);
         }
-      } else if (el.isContentEditable) {
-        document.execCommand('delete', false, null);
-      }
+      } catch (e) {}
     }
 
     makeDraggable(handleElem, moveElem = null) {

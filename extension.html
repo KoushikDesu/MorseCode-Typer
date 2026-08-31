@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="css/themes.css">
   <link rel="stylesheet" href="css/animations.css">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/mobile.css">
   <link rel="stylesheet" href="extension/content.css">
   <style>
     .ext-hero {
@@ -184,6 +185,15 @@
       margin-top: 10px;
       outline: none;
     }
+    .faq-alert {
+      background: var(--bg-tertiary);
+      border-left: 4px solid var(--primary);
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 16px;
+    }
   </style>
 </head>
 <body>
@@ -224,8 +234,8 @@
         </p>
 
         <div class="ext-cta-row">
-          <a href="#desktop-ext" class="btn-hero btn-hero-primary">
-            <i class="fas fa-download"></i> Download Chrome / Edge Extension
+          <a href="extension.zip" download="morse-code-extension.zip" class="btn-hero btn-hero-primary">
+            <i class="fas fa-download"></i> Download Extension (.ZIP)
           </a>
           <a href="#mobile-bookmarklet" class="btn-hero btn-hero-secondary">
             <i class="fas fa-mobile-screen"></i> Mobile Bookmarklet Setup
@@ -245,27 +255,34 @@
       <div class="ext-grid">
         <!-- Desktop Extension Card -->
         <div class="ext-card" id="desktop-ext">
-          <h3><i class="fas fa-puzzle-piece"></i> Desktop Browser Extension</h3>
+          <h3><i class="fas fa-puzzle-piece"></i> Desktop Browser Extension Setup</h3>
           <p>Compatible with Google Chrome, Microsoft Edge, Brave, Opera, and Kiwi Browser (Android).</p>
           
           <ul class="step-list">
             <li>
               <span class="step-num">1</span>
-              <span>Download or clone the <code>/extension</code> folder from our repository.</span>
+              <span><strong>Download & Extract:</strong> Download the <code>extension.zip</code> file using the button below and extract it on your computer.</span>
             </li>
             <li>
               <span class="step-num">2</span>
-              <span>Open <code>chrome://extensions</code> (or <code>edge://extensions</code>) in your browser and enable <strong>Developer mode</strong> (top right toggle).</span>
+              <span><strong>Open Extensions:</strong> Open <code>chrome://extensions</code> (or <code>edge://extensions</code>) in your browser and turn <strong>ON "Developer mode"</strong> in the top right.</span>
             </li>
             <li>
               <span class="step-num">3</span>
-              <span>Click <strong>Load unpacked</strong> and select the <code>extension</code> folder. Done! The floating ball will appear on every webpage you visit.</span>
+              <span><strong>Load Folder:</strong> Click <strong>"Load unpacked"</strong> (top left) and select the extracted folder (which contains <code>manifest.json</code>).</span>
             </li>
           </ul>
 
-          <a href="https://github.com/KoushikDesu/MorseCode-Typer/archive/refs/heads/main.zip" class="btn-hero btn-hero-primary" style="width: 100%; justify-content: center;">
-            <i class="fas fa-file-zipper"></i> Download Repository & Extension (.ZIP)
-          </a>
+          <div class="faq-alert">
+            <i class="fas fa-info-circle" style="color: var(--primary);"></i> <strong>Notice about "Manifest is missing":</strong><br>
+            Always make sure you <strong>extract/unzip</strong> the downloaded file first, and select the extracted folder that contains <code>manifest.json</code>.
+          </div>
+
+          <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="extension.zip" download="morse-code-extension.zip" class="btn-hero btn-hero-primary" style="flex: 1; justify-content: center;">
+              <i class="fas fa-file-zipper"></i> Download Extension (.ZIP)
+            </a>
+          </div>
         </div>
 
         <!-- Mobile Bookmarklet Card -->
@@ -276,7 +293,7 @@
           <ul class="step-list">
             <li>
               <span class="step-num">1</span>
-              <span>Bookmark any page in your mobile browser and name it <strong>"Morse Typer"</strong>.</span>
+              <span>Bookmark any webpage in your mobile browser and name it <strong>"Morse Typer"</strong>.</span>
             </li>
             <li>
               <span class="step-num">2</span>
@@ -295,9 +312,14 @@
           <ul class="step-list" style="margin-top: 16px;">
             <li>
               <span class="step-num">3</span>
-              <span>Open any website, type "Morse Typer" in the address bar and tap the bookmark. The floating ball appears instantly!</span>
+              <span>Open any website, type "Morse Typer" in the address bar, and tap the bookmark. The floating ball appears instantly!</span>
             </li>
           </ul>
+
+          <div class="faq-alert">
+            <i class="fas fa-cloud-bolt" style="color: var(--primary);"></i> <strong>Auto-Update Guarantee:</strong><br>
+            The Mobile Bookmarklet loads directly from the live cloud every time, so whenever we release updates, your mobile bookmarklet <strong>updates automatically with zero manual steps</strong>!
+          </div>
         </div>
       </div>
     </main>
