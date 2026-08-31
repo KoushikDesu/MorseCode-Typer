@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Browser Extension & Mobile Bookmarklet | MORSE CODE TYPER</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="extension/content.css">
+  <style>
+    .ext-hero {
+      text-align: center;
+      padding: 40px 0 30px 0;
+    }
+    .ext-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      background: var(--primary-light);
+      color: var(--primary);
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+    .ext-title {
+      font-size: 34px;
+      font-weight: 900;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+    .ext-desc {
+      font-size: 16px;
+      color: var(--text-secondary);
+      max-width: 680px;
+      margin: 0 auto 30px auto;
+      line-height: 1.6;
+    }
+    .ext-cta-row {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 40px;
+    }
+    .btn-hero {
+      padding: 14px 28px;
+      border-radius: var(--radius-md);
+      font-size: 15px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.25s ease;
+      box-shadow: var(--shadow-md);
+    }
+    .btn-hero-primary {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: #fff;
+      border: none;
+    }
+    .btn-hero-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px var(--primary-glow);
+    }
+    .btn-hero-secondary {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+    .btn-hero-secondary:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    .ext-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      margin-bottom: 50px;
+    }
+    @media (max-width: 768px) {
+      .ext-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .ext-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      box-shadow: var(--shadow-md);
+    }
+    .ext-card h3 {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .ext-card h3 i {
+      color: var(--primary);
+    }
+    .ext-card p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+    .step-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 20px 0;
+    }
+    .step-list li {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .step-num {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 800;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .code-box-wrap {
+      position: relative;
+      background: #090d16;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      margin: 14px 0;
+      overflow-x: auto;
+    }
+    .code-text {
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 12px;
+      color: #00f0ff;
+      word-break: break-all;
+      white-space: pre-wrap;
+    }
+    .copy-code-btn {
+      margin-top: 8px;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .sandbox-test-input {
+      width: 100%;
+      padding: 14px;
+      border-radius: var(--radius-md);
+      border: 2px dashed var(--primary);
+      background: var(--bg-input);
+      color: var(--text-primary);
+      font-size: 15px;
+      font-weight: 600;
+      margin-top: 10px;
+      outline: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="screen-mana-shader"></div>
+  <canvas id="manaAuraCanvas"></canvas>
+
+  <div class="app-wrapper">
+    <header class="main-header">
+      <div class="container header-inner">
+        <div class="brand-section">
+          <a href="index.html" style="text-decoration: none; display: flex; align-items: center; gap: 14px;">
+            <img src="assets/logo.svg" alt="Morse Code Typer Logo" class="brand-logo-img">
+            <div class="brand-titles">
+              <h1 class="main-title">MORSE CODE TYPER</h1>
+              <div class="morse-sub-title">-- --- .-. ... . / -.-. --- -.. . / - -.-- .--. . .-.</div>
+            </div>
+          </a>
+        </div>
+
+        <div class="header-actions">
+          <a href="index.html" class="btn-icon-labeled" style="text-decoration: none;">
+            <i class="fas fa-arrow-left"></i> <span>Back to Main Web</span>
+          </a>
+          <button id="themeToggleBtn" class="btn-icon-labeled" title="Toggle Theme">
+            <i class="fas fa-moon"></i> <span class="btn-text">Dark Mode</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content container">
+      <!-- Hero Section -->
+      <section class="ext-hero">
+        <div class="ext-badge"><i class="fas fa-sparkles"></i> Virtual Floating Assistant & Mobile Bookmarklet</div>
+        <h2 class="ext-title">Type Morse Code Anywhere on the Web</h2>
+        <p class="ext-desc">
+          A floating ball that expands into a Morse code keyer. Place your cursor in any text field on any website (Notepad, ChatGPT, Google Docs, LeetCode, CodeMirror) and type directly using mouse clicks, touches, and customizable holds!
+        </p>
+
+        <div class="ext-cta-row">
+          <a href="#desktop-ext" class="btn-hero btn-hero-primary">
+            <i class="fas fa-download"></i> Download Chrome / Edge Extension
+          </a>
+          <a href="#mobile-bookmarklet" class="btn-hero btn-hero-secondary">
+            <i class="fas fa-mobile-screen"></i> Mobile Bookmarklet Setup
+          </a>
+        </div>
+
+        <!-- Interactive Sandbox on Page -->
+        <div style="max-width: 600px; margin: 0 auto 40px auto; text-align: left; background: var(--bg-card); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+          <div style="font-size: 13px; font-weight: 700; color: var(--primary); margin-bottom: 6px;">
+            <i class="fas fa-vial"></i> Live Test Input (Click this box, then use the floating ball in the bottom corner to type!):
+          </div>
+          <input type="text" class="sandbox-test-input" placeholder="Click here to focus, then click/tap the floating ball to type Morse code directly!">
+        </div>
+      </section>
+
+      <!-- Details & Installation Grid -->
+      <div class="ext-grid">
+        <!-- Desktop Extension Card -->
+        <div class="ext-card" id="desktop-ext">
+          <h3><i class="fas fa-puzzle-piece"></i> Desktop Browser Extension</h3>
+          <p>Compatible with Google Chrome, Microsoft Edge, Brave, Opera, and Kiwi Browser (Android).</p>
+          
+          <ul class="step-list">
+            <li>
+              <span class="step-num">1</span>
+              <span>Download or clone the <code>/extension</code> folder from our repository.</span>
+            </li>
+            <li>
+              <span class="step-num">2</span>
+              <span>Open <code>chrome://extensions</code> (or <code>edge://extensions</code>) in your browser and enable <strong>Developer mode</strong> (top right toggle).</span>
+            </li>
+            <li>
+              <span class="step-num">3</span>
+              <span>Click <strong>Load unpacked</strong> and select the <code>extension</code> folder. Done! The floating ball will appear on every webpage you visit.</span>
+            </li>
+          </ul>
+
+          <a href="https://github.com/KoushikDesu/MorseCode-Typer/archive/refs/heads/main.zip" class="btn-hero btn-hero-primary" style="width: 100%; justify-content: center;">
+            <i class="fas fa-file-zipper"></i> Download Repository & Extension (.ZIP)
+          </a>
+        </div>
+
+        <!-- Mobile Bookmarklet Card -->
+        <div class="ext-card" id="mobile-bookmarklet">
+          <h3><i class="fas fa-mobile-screen-button"></i> Universal Mobile Bookmarklet</h3>
+          <p>Use on mobile phones (Safari on iOS, Chrome on Android, Samsung Internet) without needing an extension store!</p>
+
+          <ul class="step-list">
+            <li>
+              <span class="step-num">1</span>
+              <span>Bookmark any page in your mobile browser and name it <strong>"Morse Typer"</strong>.</span>
+            </li>
+            <li>
+              <span class="step-num">2</span>
+              <span>Edit the bookmark's URL and paste the JavaScript code below:</span>
+            </li>
+          </ul>
+
+          <div class="code-box-wrap">
+            <div class="code-text" id="bookmarkletCodeText">javascript:(function(){var s=document.createElement('script');s.src='https://morcecodekt.vercel.app/extension/morse-injector.js';document.body.appendChild(s);})();</div>
+          </div>
+
+          <button class="copy-code-btn" id="copyBookmarkletBtn">
+            <i class="fas fa-copy"></i> Copy Bookmarklet Code
+          </button>
+
+          <ul class="step-list" style="margin-top: 16px;">
+            <li>
+              <span class="step-num">3</span>
+              <span>Open any website, type "Morse Typer" in the address bar and tap the bookmark. The floating ball appears instantly!</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </main>
+
+    <footer class="main-footer">
+      <div class="container footer-bottom-row">
+        <div class="creator-morse-inscribed">-.-. .-. . .- - . -.. / -... -.-- / - .... . / -.- .. -. --. / --- ..-. / ... - .- - . ...</div>
+        <div class="creator-text-sub">Created by the King of States &bull; All Rights Reserved</div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/app.js"></script>
+  <script src="extension/content.js"></script>
+  <script>
+    document.getElementById('copyBookmarkletBtn').addEventListener('click', () => {
+      const code = document.getElementById('bookmarkletCodeText').textContent;
+      navigator.clipboard.writeText(code).then(() => {
+        window.showToast('Bookmarklet code copied to clipboard!', 'success');
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,410 @@
+/**
+ * MorseCode-Typer - Dedicated Mobile Stylesheet
+ * Scoped strictly to screens <= 768px to preserve desktop UI 100%
+ */
+
+@media (max-width: 768px) {
+  /* Layout & Container */
+  .container {
+    padding: 0 14px;
+  }
+
+  body {
+    font-size: 14px;
+  }
+
+  /* Header Optimization */
+  .main-header {
+    padding: 14px 0 10px 0;
+  }
+
+  .header-inner {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .brand-section {
+    gap: 10px;
+  }
+
+  .brand-logo-img {
+    width: 38px;
+    height: 38px;
+  }
+
+  .main-title {
+    font-size: 17px;
+    letter-spacing: 1px;
+  }
+
+  .morse-sub-title {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+  }
+
+  .header-actions {
+    gap: 6px;
+  }
+
+  .btn-icon-labeled {
+    padding: 7px 10px;
+    font-size: 12px;
+    border-radius: 8px;
+  }
+
+  .btn-icon-labeled .btn-text, .btn-icon-labeled span {
+    font-size: 11px;
+  }
+
+  .btn-icon-only {
+    width: 34px;
+    height: 34px;
+    font-size: 14px;
+  }
+
+  /* Navigation Bar - Horizontal Swipeable Capsule Grid */
+  .navigation-bar {
+    padding: 8px 0 12px 0;
+    margin-bottom: 6px;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .navigation-bar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav-tabs-grid {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    padding: 0 14px;
+  }
+
+  .nav-tab-btn {
+    padding: 9px 14px;
+    border-radius: 20px;
+    font-size: 12.5px;
+    flex-shrink: 0;
+  }
+
+  .nav-tab-btn i {
+    font-size: 14px;
+  }
+
+  /* Section Headers */
+  .section-header {
+    margin-bottom: 14px;
+  }
+
+  .section-title {
+    font-size: 17px;
+  }
+
+  .section-desc {
+    font-size: 12.5px;
+    line-height: 1.4;
+  }
+
+  .section-header-actions {
+    width: 100%;
+    margin-top: 6px;
+  }
+
+  .section-header-actions .btn-icon-labeled {
+    flex: 1;
+    justify-content: center;
+  }
+
+  /* Translator Mobile */
+  .translator-card {
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  .translator-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  .translator-textarea {
+    height: 120px;
+    padding: 12px;
+    font-size: 15px;
+  }
+
+  .translator-textarea.morse-code-font {
+    font-size: 16px;
+    letter-spacing: 1.5px;
+  }
+
+  .translator-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding-top: 12px;
+  }
+
+  .wpm-control {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .translator-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .translator-actions .btn-icon-labeled {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .stats-badge {
+    text-align: center;
+    font-size: 11px;
+  }
+
+  /* Mouse & Touch Typer Workspace */
+  .typer-workspace {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .tapping-pad-card, .decoded-output-card {
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  .live-buffer-board {
+    padding: 10px 14px;
+  }
+
+  .buffer-symbols {
+    font-size: 18px;
+    letter-spacing: 2px;
+  }
+
+  .buffer-char-preview {
+    font-size: 15px;
+  }
+
+  .interactive-pad-surface {
+    min-height: 180px;
+    margin-bottom: 12px;
+    border-radius: 12px;
+  }
+
+  .pad-instruction-icon {
+    font-size: 30px;
+    margin-bottom: 6px;
+  }
+
+  .pad-instruction-text {
+    font-size: 13.5px;
+  }
+
+  .pad-instruction-sub {
+    font-size: 11.5px;
+  }
+
+  .live-key-hint {
+    font-size: 10.5px;
+    padding: 3px 8px;
+  }
+
+  .decoded-output-textarea {
+    min-height: 120px;
+    font-size: 15px;
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+
+  .output-action-bar {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+
+  .output-action-bar .btn-icon-labeled {
+    padding: 8px 4px;
+    font-size: 11px;
+    justify-content: center;
+  }
+
+  /* On-Screen Mobile Morse Keypad for Keyboard Card */
+  .mobile-onscreen-keypad {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+    padding: 10px;
+    background: var(--bg-tertiary);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+  }
+
+  .mobile-key-spacebar {
+    width: 100%;
+    padding: 16px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: #fff;
+    border: none;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 15px var(--primary-glow);
+    touch-action: manipulation;
+  }
+
+  .mobile-key-spacebar:active {
+    transform: scale(0.98);
+  }
+
+  .mobile-key-aux-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+
+  .mobile-key-btn {
+    padding: 12px 6px;
+    border-radius: 8px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    text-align: center;
+    touch-action: manipulation;
+  }
+
+  .mobile-key-btn:active {
+    background: var(--primary-light);
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+
+  /* Learn Grid Mobile */
+  .learn-filters-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .filter-btn-group {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+
+  .learn-filter-btn {
+    padding: 8px;
+    text-align: center;
+    font-size: 12px;
+  }
+
+  .learn-search-input {
+    width: 100%;
+    padding: 10px;
+  }
+
+  .learn-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .learn-char-card {
+    padding: 14px;
+  }
+
+  /* Practice Arena Mobile */
+  .practice-container {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .practice-sidebar-card {
+    padding: 14px;
+    gap: 12px;
+  }
+
+  .quiz-main-card {
+    padding: 16px;
+    min-height: auto;
+  }
+
+  .quiz-prompt-text {
+    font-size: 28px;
+    letter-spacing: 2px;
+  }
+
+  .quiz-sound-banner-btn {
+    width: 100%;
+    padding: 14px;
+    font-size: 14.5px;
+    justify-content: center;
+  }
+
+  .quiz-options-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .quiz-option-btn {
+    padding: 14px 16px;
+    font-size: 15px;
+    min-height: 50px;
+  }
+
+  .interactive-tap-buffer {
+    min-height: 50px;
+    font-size: 20px;
+    padding: 10px;
+  }
+
+  .interactive-tap-buttons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+
+  .quiz-tap-action-btn {
+    padding: 10px 4px;
+    font-size: 13px;
+    justify-content: center;
+  }
+
+  #quizTapSubmitBtn {
+    grid-column: span 3;
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  /* Footer Mobile */
+  .main-footer {
+    padding: 24px 0 16px 0;
+  }
+
+  .footer-content-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .footer-bottom-row {
+    padding-top: 14px;
+  }
+
+  .creator-morse-inscribed {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+  }
+}

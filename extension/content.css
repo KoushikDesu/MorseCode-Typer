@@ -1,0 +1,341 @@
+/**
+ * Morse Code Floating Extension - Isolated CSS Styles
+ */
+
+:root {
+  --mext-primary: #00f0ff;
+  --mext-secondary: #3b82f6;
+  --mext-bg: rgba(12, 16, 26, 0.95);
+  --mext-card: #131b2c;
+  --mext-border: #1e293b;
+  --mext-text: #f0f6fc;
+  --mext-muted: #94a3b8;
+  --mext-gold: #fbbf24;
+  --mext-glow: rgba(0, 240, 255, 0.4);
+}
+
+[data-mext-theme="light"] {
+  --mext-primary: #2563eb;
+  --mext-secondary: #0284c7;
+  --mext-bg: rgba(255, 255, 255, 0.97);
+  --mext-card: #f8fafc;
+  --mext-border: #cbd5e1;
+  --mext-text: #0f172a;
+  --mext-muted: #64748b;
+  --mext-gold: #d97706;
+  --mext-glow: rgba(37, 99, 235, 0.25);
+}
+
+/* Floating Ball Trigger */
+#morse-ext-ball {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--mext-primary), var(--mext-secondary));
+  box-shadow: 0 6px 22px var(--mext-glow), 0 0 15px var(--mext-glow);
+  z-index: 2147483645;
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-family: system-ui, -apple-system, sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
+}
+
+#morse-ext-ball:hover {
+  transform: scale(1.1);
+  box-shadow: 0 8px 30px var(--mext-glow), 0 0 25px var(--mext-glow);
+}
+
+#morse-ext-ball:active {
+  cursor: grabbing;
+  transform: scale(0.95);
+}
+
+.mext-ball-icon {
+  width: 32px;
+  height: 32px;
+  pointer-events: none;
+}
+
+/* Floating Morse Widget Box */
+#morse-ext-widget {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 330px;
+  max-width: 92vw;
+  background: var(--mext-bg);
+  color: var(--mext-text);
+  border: 1.5px solid var(--mext-border);
+  border-radius: 18px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 25px var(--mext-glow);
+  z-index: 2147483646;
+  font-family: system-ui, -apple-system, sans-serif;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  animation: mextFadeIn 0.25s ease-out;
+  touch-action: manipulation;
+}
+
+#morse-ext-widget.mext-open {
+  display: flex;
+}
+
+@keyframes mextFadeIn {
+  from { opacity: 0; transform: scale(0.9) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Widget Header */
+.mext-header {
+  padding: 10px 14px;
+  background: var(--mext-card);
+  border-bottom: 1px solid var(--mext-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.mext-header:active {
+  cursor: grabbing;
+}
+
+.mext-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: var(--mext-primary);
+}
+
+.mext-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.mext-btn-icon {
+  background: transparent;
+  border: none;
+  color: var(--mext-muted);
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.mext-btn-icon:hover {
+  background: rgba(0, 240, 255, 0.15);
+  color: var(--mext-primary);
+}
+
+.mext-btn-icon.mext-active {
+  background: var(--mext-primary);
+  color: #fff;
+}
+
+/* Active Target Element Status Indicator */
+.mext-target-bar {
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(0, 240, 255, 0.08);
+  color: var(--mext-primary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--mext-border);
+}
+
+/* Buffer & Countdown Board */
+.mext-buffer-row {
+  padding: 10px 14px;
+  background: var(--mext-card);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--mext-border);
+}
+
+.mext-buffer-text {
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--mext-primary);
+  letter-spacing: 3px;
+  min-height: 28px;
+}
+
+.mext-preview-badge {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--mext-gold);
+}
+
+.mext-timer-svg {
+  width: 28px;
+  height: 28px;
+  transform: rotate(-90deg);
+}
+
+.mext-timer-bg {
+  fill: none;
+  stroke: var(--mext-border);
+  stroke-width: 3;
+}
+
+.mext-timer-val {
+  fill: none;
+  stroke: var(--mext-primary);
+  stroke-width: 3;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  transition: stroke-dashoffset 0.05s linear;
+}
+
+/* Interactive Tapping Pad */
+.mext-pad {
+  margin: 12px;
+  padding: 24px 14px;
+  background: rgba(0, 240, 255, 0.04);
+  border: 2px dashed var(--mext-border);
+  border-radius: 12px;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: all 0.2s ease;
+  touch-action: manipulation;
+}
+
+.mext-pad:hover {
+  border-color: var(--mext-primary);
+  background: rgba(0, 240, 255, 0.08);
+}
+
+.mext-pad.mext-pressed {
+  background: rgba(0, 240, 255, 0.18);
+  border-color: var(--mext-primary);
+  transform: scale(0.98);
+  box-shadow: inset 0 0 15px var(--mext-glow);
+}
+
+.mext-pad-title {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: var(--mext-text);
+}
+
+.mext-pad-sub {
+  font-size: 11px;
+  color: var(--mext-muted);
+  margin-top: 3px;
+}
+
+/* Action Buttons Toolbar */
+.mext-toolbar {
+  padding: 8px 12px 12px 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mext-btn {
+  flex: 1;
+  min-width: 56px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: var(--mext-card);
+  border: 1px solid var(--mext-border);
+  color: var(--mext-text);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+  touch-action: manipulation;
+}
+
+.mext-btn:hover {
+  border-color: var(--mext-primary);
+  background: rgba(0, 240, 255, 0.12);
+  color: var(--mext-primary);
+}
+
+.mext-btn-accent {
+  background: var(--mext-primary);
+  color: #fff;
+  border-color: transparent;
+}
+
+.mext-btn-accent:hover {
+  filter: brightness(1.15);
+}
+
+/* Settings Drawer inside Widget */
+.mext-settings-drawer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--mext-card);
+  border-top: 1px solid var(--mext-border);
+}
+
+.mext-settings-drawer.mext-drawer-open {
+  max-height: 280px;
+  overflow-y: auto;
+  padding: 12px 14px;
+}
+
+.mext-form-group {
+  margin-bottom: 10px;
+}
+
+.mext-form-group label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--mext-muted);
+  margin-bottom: 3px;
+}
+
+.mext-select, .mext-input {
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: var(--mext-bg);
+  border: 1px solid var(--mext-border);
+  color: var(--mext-text);
+  font-size: 11px;
+  outline: none;
+}
+
+.mext-select:focus, .mext-input:focus {
+  border-color: var(--mext-primary);
+}

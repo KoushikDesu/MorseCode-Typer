@@ -2,13 +2,15 @@
 <html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>MORSE CODE TYPER | King of States & Solo Leveling Edition</title>
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="css/themes.css">
   <link rel="stylesheet" href="css/animations.css">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/mobile.css">
+  <link rel="stylesheet" href="extension/content.css">
 </head>
 <body>
   <!-- Solo Leveling Screen Perimeter Mana Aura Shader -->
@@ -28,6 +30,9 @@
         </div>
 
         <div class="header-actions">
+          <a href="extension.html" class="btn-icon-labeled" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); color: #fff; text-decoration: none;" title="Get Floating Web Extension & Mobile Bookmarklet">
+            <i class="fas fa-puzzle-piece"></i> <span>Extension</span>
+          </a>
           <button id="soundToggleBtn" class="btn-icon-only" title="Toggle Sound">
             <i class="fas fa-volume-up"></i>
           </button>
@@ -48,7 +53,7 @@
           <i class="fas fa-exchange-alt"></i> Live Translator
         </button>
         <button class="nav-tab-btn" data-tab="mouse">
-          <i class="fas fa-mouse"></i> Mouse Typer
+          <i class="fas fa-mouse"></i> Mouse & Touch Typer
         </button>
         <button class="nav-tab-btn" data-tab="keyboard">
           <i class="fas fa-keyboard"></i> Keyboard Typer
@@ -118,7 +123,7 @@
 
             <div class="translator-actions">
               <button id="translatorPlayBtn" class="btn-icon-labeled" style="background: var(--primary); color: #fff;">
-                <i class="fas fa-play"></i> Play Morse Tone
+                <i class="fas fa-play"></i> Play Tone
               </button>
               <button id="clearTranslatorBtn" class="btn-icon-labeled">
                 <i class="fas fa-trash-alt"></i> Clear All
@@ -131,17 +136,17 @@
       </section>
 
       <!-- ====================================================================
-           TAB 2: MOUSE MORSE TYPER (CARD 1)
+           TAB 2: MOUSE & TOUCH MORSE TYPER (CARD 1)
            ==================================================================== -->
       <section id="tab-mouse" class="tab-pane">
         <div class="section-header">
           <div>
-            <h2 class="section-title"><i class="fas fa-mouse"></i> Mouse Morse Typer</h2>
-            <p class="section-desc">Click on the board to transmit signals. Single click or hold to transmit dots, dashes, and letter breaks (/).</p>
+            <h2 class="section-title"><i class="fas fa-mouse"></i> Mouse & Touch Morse Typer</h2>
+            <p class="section-desc">Click or tap to transmit signals. Single click/tap or hold for dots, dashes, and letter breaks (/).</p>
           </div>
           <div class="section-header-actions">
             <button id="openMouseSettingsBtn" class="btn-icon-labeled">
-              <i class="fas fa-sliders"></i> Customize Buttons & Hold
+              <i class="fas fa-sliders"></i> Customize Buttons & Touch
             </button>
             <button class="btn-icon-labeled open-help-modal-btn" data-guide="mouse">
               <i class="fas fa-question-circle"></i> Instructions
@@ -165,12 +170,12 @@
               <div id="mouseCommitFlash" class="commit-flash-overlay"></div>
             </div>
 
-            <!-- Interactive Mouse Clicking Pad -->
+            <!-- Interactive Mouse & Touch Clicking Pad -->
             <div id="mouseClickPad" class="interactive-pad-surface">
               <div class="pad-instruction-icon"><i class="fas fa-hand-pointer"></i></div>
-              <div class="pad-instruction-text">CLICK OR HOLD HERE TO TRANSMIT MORSE</div>
-              <div class="pad-instruction-sub" id="mousePadInstructionHint">Left: DOT | Right: DASH | (/) = Break, (//) = Space</div>
-              <div class="live-key-hint">Customizable in Options: assign Dot, Dash, Break (/), Space (//) & Hold to any button!</div>
+              <div class="pad-instruction-text">CLICK OR TAP TO TRANSMIT MORSE</div>
+              <div class="pad-instruction-sub" id="mousePadInstructionHint">Left/Tap: DOT | Right/Hold: DASH | (/) = Break, (//) = Space</div>
+              <div class="live-key-hint">Tactile & Haptic Enabled &bull; Full Button Customization in Options!</div>
             </div>
           </div>
 
@@ -202,7 +207,7 @@
         <div class="section-header">
           <div>
             <h2 class="section-title"><i class="fas fa-keyboard"></i> Keyboard Morse Typer</h2>
-            <p class="section-desc">Transmit using your keyboard. Tap Spacebar for Dot, hold Spacebar for Dash, or type [.], [-], [/] directly!</p>
+            <p class="section-desc">Transmit using your physical keyboard or the responsive on-screen mobile keypad below!</p>
           </div>
           <div class="section-header-actions">
             <button id="openKeyboardSettingsBtn" class="btn-icon-labeled">
@@ -236,6 +241,19 @@
               <div class="pad-instruction-text" id="keyboardLiveKeyIndicator">PRESS KEYBOARD KEY TO TRANSMIT</div>
               <div class="pad-instruction-sub" id="keyboardKeyHintBadge">Active Key: [ SPACEBAR ] (Tap = Dot, Hold = Dash) | Direct [ . ] [ - ] [ / ] active</div>
               <div class="live-key-hint">Press [/] for Letter Break &bull; [//] or [Enter] for Word Space</div>
+            </div>
+
+            <!-- Mobile Visual Keypad -->
+            <div class="mobile-onscreen-keypad">
+              <button id="mobileSpacebarBtn" class="mobile-key-spacebar" type="button">
+                <i class="fas fa-hand-pointer"></i> TAP = DOT ( • ) &nbsp;|&nbsp; HOLD = DASH ( — )
+              </button>
+              <div class="mobile-key-aux-grid">
+                <button id="mobileDotBtn" class="mobile-key-btn" type="button">Dot ( . )</button>
+                <button id="mobileDashBtn" class="mobile-key-btn" type="button">Dash ( - )</button>
+                <button id="mobileSlashBtn" class="mobile-key-btn" type="button">Break ( / )</button>
+                <button id="mobileWordSpaceBtn" class="mobile-key-btn" type="button">Space ( // )</button>
+              </div>
             </div>
           </div>
 
@@ -271,7 +289,7 @@
           </div>
           <div class="section-header-actions">
             <button id="viewFullChartBtn" class="btn-icon-labeled" style="background: var(--primary); color: #fff;">
-              <i class="fas fa-image"></i> View Visual Mnemonic Chart
+              <i class="fas fa-image"></i> View Visual Chart
             </button>
             <button class="btn-icon-labeled open-help-modal-btn" data-guide="learn">
               <i class="fas fa-question-circle"></i> Instructions
@@ -316,7 +334,7 @@
             <div class="form-group">
               <label for="practiceQuizMode"><i class="fas fa-gamepad"></i> Challenge Mode</label>
               <select id="practiceQuizMode" class="form-control">
-                <option value="all-mixed" selected>⚡ Mixed Challenge (All Modes Shuffled)</option>
+                <option value="all-mixed" selected>⚡ Mixed Challenge (All Modes)</option>
                 <option value="morse-to-text">Morse ➔ Character (MCQ)</option>
                 <option value="text-to-morse">Character ➔ Morse (MCQ)</option>
                 <option value="audio-to-text">Audio Tone ➔ Character</option>
@@ -373,7 +391,7 @@
               <button id="quizAudioPlayBtn" class="quiz-sound-banner-btn" type="button">
                 <i class="fas fa-volume-high"></i> <span>Play Sound Signal</span>
               </button>
-              <span style="font-size: 13px; color: var(--text-muted);">Click button to listen or replay the audio tone</span>
+              <span style="font-size: 13px; color: var(--text-muted);">Tap button to listen or replay the audio tone</span>
             </div>
 
             <!-- Multiple Choice Grid -->
@@ -411,7 +429,7 @@
         <div class="footer-content-grid">
           <div class="footer-brand">
             <h3><i class="fas fa-satellite-dish"></i> MorseCode-Typer</h3>
-            <p>A next-generation interactive Morse code environment featuring real-time translation, customizable mouse & keyboard keying boards, mnemonic learning aids, and procedural training.</p>
+            <p>A next-generation interactive Morse code environment featuring real-time translation, customizable mouse & keyboard keying boards, floating web extension, and procedural training.</p>
           </div>
 
           <div class="footer-motivation">
@@ -422,8 +440,11 @@
           </div>
 
           <div class="footer-feedback">
-            <h4>Feedback & Inquiries</h4>
-            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 8px;">Created with passion. Send your thoughts or feature requests:</p>
+            <h4>Floating Extension & Feedback</h4>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 8px;">Type Morse on any website with our floating extension & mobile bookmarklet:</p>
+            <a href="extension.html" class="feedback-email-link" style="margin-bottom: 8px;">
+              <i class="fas fa-puzzle-piece"></i> Get Floating Extension
+            </a>
             <a href="mailto:kingofstates2239@gmail.com" class="feedback-email-link">
               <i class="fas fa-envelope"></i> kingofstates2239@gmail.com
             </a>
@@ -450,7 +471,7 @@
   <div id="mouseSettingsModal" class="modal-overlay">
     <div class="modal-card wide-modal">
       <div class="modal-header">
-        <h3><i class="fas fa-sliders"></i> Customize Mouse Buttons & Hold Controls</h3>
+        <h3><i class="fas fa-sliders"></i> Customize Mouse & Touch Controls</h3>
         <button id="closeMouseSettingsBtn" class="modal-close-btn"><i class="fas fa-times"></i></button>
       </div>
       <div class="modal-body">
@@ -468,9 +489,9 @@
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
           <!-- Left Click Customizer -->
           <div style="background: var(--bg-tertiary); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-            <h4 style="font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 10px;"><i class="fas fa-hand-pointer"></i> Left Mouse Button</h4>
+            <h4 style="font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 10px;"><i class="fas fa-hand-pointer"></i> Left Click / Main Tap</h4>
             <div class="form-group">
-              <label for="mouseLeftSingle">Single Click Action</label>
+              <label for="mouseLeftSingle">Single Click / Tap Action</label>
               <select id="mouseLeftSingle" class="form-control">
                 <option value="dot">Dot ( . )</option>
                 <option value="dash">Dash ( - )</option>
@@ -493,7 +514,7 @@
 
           <!-- Right Click Customizer -->
           <div style="background: var(--bg-tertiary); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-            <h4 style="font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 10px;"><i class="fas fa-hand-pointer"></i> Right Mouse Button</h4>
+            <h4 style="font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 10px;"><i class="fas fa-hand-pointer"></i> Right Click / Right Zone</h4>
             <div class="form-group">
               <label for="mouseRightSingle">Single Click Action</label>
               <select id="mouseRightSingle" class="form-control">

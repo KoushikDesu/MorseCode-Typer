@@ -99,12 +99,16 @@ class MouseMorseBoardController {
     this.pad.addEventListener('touchstart', (e) => {
       e.preventDefault();
       const touch = e.touches[0];
-      this.handleMouseDown({ button: 0, clientX: touch.clientX, clientY: touch.clientY });
+      const rect = this.pad.getBoundingClientRect();
+      const relativeX = touch.clientX - rect.left;
+      // If tapped on the right 40% of pad on mobile, act as Right button
+      const buttonId = (relativeX > rect.width * 0.6) ? 2 : 0;
+      this.handleMouseDown({ button: buttonId, clientX: touch.clientX, clientY: touch.clientY });
     }, { passive: false });
 
     this.pad.addEventListener('touchend', (e) => {
       e.preventDefault();
-      this.handleMouseUp({ button: 0 });
+      this.handleMouseUp({ button: this.activeButton });
     }, { passive: false });
 
     // Output Box Action Buttons
@@ -222,6 +226,13 @@ class MouseMorseBoardController {
   }
 
   executeAction(action, isLongPress = false) {
+    if (navigator.vibrate) {
+      if (action === 'dot') navigator.vibrate(25);
+      else if (action === 'dash') navigator.vibrate(60);
+      else if (action === 'slash') navigator.vibrate(40);
+      else if (action === 'double-slash' || action === 'space') navigator.vibrate([30, 30, 30]);
+    }
+
     if (action === 'dot') {
       this.appendSymbol('.');
       this.consecutiveSlashes = 0;

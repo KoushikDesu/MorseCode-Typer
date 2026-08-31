@@ -117,6 +117,9 @@ class KeyboardMorseBoardController {
       });
     }
 
+    // Mobile Virtual Keypad Listeners
+    this.bindMobileKeypad();
+
     if (this.speakBtn) {
       this.speakBtn.addEventListener('click', () => {
         const text = this.outputBox.value.trim();
@@ -140,6 +143,92 @@ class KeyboardMorseBoardController {
 
     this.bindSettingsModal();
     this.updateKeyHintBadge();
+  }
+
+  bindMobileKeypad() {
+    const spaceBtn = document.getElementById('mobileSpacebarBtn');
+    const dotBtn = document.getElementById('mobileDotBtn');
+    const dashBtn = document.getElementById('mobileDashBtn');
+    const slashBtn = document.getElementById('mobileSlashBtn');
+    const backBtn = document.getElementById('mobileBackBtn');
+    const wordSpaceBtn = document.getElementById('mobileWordSpaceBtn');
+
+    if (spaceBtn) {
+      let touchStartTime = 0;
+      const onDown = (e) => {
+        e.preventDefault();
+        touchStartTime = Date.now();
+        this.clearCommitTimers();
+        this.setPadVisualActive(true, 'HOLDING SPACEBAR...');
+        window.morseAudio.startTone();
+      };
+      const onUp = (e) => {
+        e.preventDefault();
+        window.morseAudio.stopTone();
+        const dur = Date.now() - touchStartTime;
+        if (dur >= this.config.singleThreshold) {
+          this.appendSymbol('-');
+          this.setPadVisualActive(false, 'DASH (-) RECORDED');
+          if (navigator.vibrate) navigator.vibrate(60);
+        } else {
+          this.appendSymbol('.');
+          this.setPadVisualActive(false, 'DOT (.) RECORDED');
+          if (navigator.vibrate) navigator.vibrate(25);
+        }
+        if (this.config.autoCommit) this.startCommitTimer();
+      };
+
+      spaceBtn.addEventListener('mousedown', onDown);
+      spaceBtn.addEventListener('mouseup', onUp);
+      spaceBtn.addEventListener('touchstart', onDown, { passive: false });
+      spaceBtn.addEventListener('touchend', onUp, { passive: false });
+    }
+
+    if (dotBtn) {
+      dotBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.clearCommitTimers();
+        this.appendSymbol('.');
+        window.morseAudio.playDit();
+        if (navigator.vibrate) navigator.vibrate(25);
+        if (this.config.autoCommit) this.startCommitTimer();
+      });
+    }
+
+    if (dashBtn) {
+      dashBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.clearCommitTimers();
+        this.appendSymbol('-');
+        window.morseAudio.playDah();
+        if (navigator.vibrate) navigator.vibrate(60);
+        if (this.config.autoCommit) this.startCommitTimer();
+      });
+    }
+
+    if (slashBtn) {
+      slashBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.handleSlashAction();
+        if (navigator.vibrate) navigator.vibrate(40);
+      });
+    }
+
+    if (wordSpaceBtn) {
+      wordSpaceBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.commitLetterNow();
+        this.commitWordSpace();
+        if (navigator.vibrate) navigator.vibrate([30, 30]);
+      });
+    }
+
+    if (backBtn) {
+      backBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.handleBackspace();
+      });
+    }
   }
 
   isKeyboardCardActive() {
