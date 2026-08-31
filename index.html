@@ -172,10 +172,28 @@
 
             <!-- Interactive Mouse & Touch Clicking Pad -->
             <div id="mouseClickPad" class="interactive-pad-surface">
-              <div class="pad-instruction-icon"><i class="fas fa-hand-pointer"></i></div>
-              <div class="pad-instruction-text">CLICK OR TAP TO TRANSMIT MORSE</div>
-              <div class="pad-instruction-sub" id="mousePadInstructionHint">Left/Tap: DOT | Right/Hold: DASH | (/) = Break, (//) = Space</div>
-              <div class="live-key-hint">Tactile & Haptic Enabled &bull; Full Button Customization in Options!</div>
+              <!-- Desktop Pad View -->
+              <div class="desktop-pad-instructions" style="padding: 24px; text-align: center;">
+                <div class="pad-instruction-icon"><i class="fas fa-hand-pointer"></i></div>
+                <div class="pad-instruction-text">CLICK OR TAP TO TRANSMIT MORSE</div>
+                <div class="pad-instruction-sub" id="mousePadInstructionHint">Left Click: DOT | Right Click: DASH | (/) = Break, (//) = Space</div>
+                <div class="live-key-hint">Tactile & Haptic Enabled &bull; Full Button Customization in Options!</div>
+              </div>
+
+              <!-- Split Dual-Zone Mobile Touch View (Visible only on mobile <= 768px) -->
+              <div class="mobile-touch-zones-overlay" style="display: none;">
+                <div class="mobile-touch-zone mobile-zone-left" id="mobileTouchZoneLeft">
+                  <span class="zone-label-badge"><i class="fas fa-hand-pointer"></i> LEFT ZONE</span>
+                  <span class="zone-action-text" id="mobileLeftZoneActionText">DOT ( • )</span>
+                  <span class="zone-sub-hint">Tap / Hold for Dash</span>
+                </div>
+                <div class="mobile-touch-divider"></div>
+                <div class="mobile-touch-zone mobile-zone-right" id="mobileTouchZoneRight">
+                  <span class="zone-label-badge"><i class="fas fa-hand-pointer"></i> RIGHT ZONE</span>
+                  <span class="zone-action-text" id="mobileRightZoneActionText">DASH ( — )</span>
+                  <span class="zone-sub-hint">Tap / Hold for Break</span>
+                </div>
+              </div>
             </div>
           </div>
 

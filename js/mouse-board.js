@@ -190,6 +190,14 @@ class MouseMorseBoardController {
     this.clearCommitTimers();
     this.pad.classList.add('active-pressed');
 
+    const leftZone = document.getElementById('mobileTouchZoneLeft');
+    const rightZone = document.getElementById('mobileTouchZoneRight');
+    if (this.activeButton === 2 && rightZone) {
+      rightZone.classList.add('active-touch');
+    } else if (leftZone) {
+      leftZone.classList.add('active-touch');
+    }
+
     this.createRipple(e);
 
     window.morseAudio.setFrequency(this.config.frequency);
@@ -204,6 +212,12 @@ class MouseMorseBoardController {
     const duration = Date.now() - this.pressStartTime;
     const btn = (e.button !== undefined && e.button !== null) ? e.button : this.activeButton;
     this.pad.classList.remove('active-pressed');
+    
+    const leftZone = document.getElementById('mobileTouchZoneLeft');
+    const rightZone = document.getElementById('mobileTouchZoneRight');
+    if (leftZone) leftZone.classList.remove('active-touch');
+    if (rightZone) rightZone.classList.remove('active-touch');
+
     window.morseAudio.stopTone();
 
     const isLongPress = duration >= this.config.longPressThreshold;
@@ -425,6 +439,12 @@ class MouseMorseBoardController {
     const lText = `Left: ${formatAction(this.config.leftSingle)}` + (this.config.leftLong !== 'none' ? ` (Hold: ${formatAction(this.config.leftLong)})` : '');
     const rText = `Right: ${formatAction(this.config.rightSingle)}` + (this.config.rightLong !== 'none' ? ` (Hold: ${formatAction(this.config.rightLong)})` : '');
     this.padHint.textContent = `${lText} | ${rText} | (/) = Break, (//) = Space`;
+
+    // Dynamic Mobile Zone Labels
+    const mobileLeft = document.getElementById('mobileLeftZoneActionText');
+    const mobileRight = document.getElementById('mobileRightZoneActionText');
+    if (mobileLeft) mobileLeft.textContent = `${formatAction(this.config.leftSingle)}`;
+    if (mobileRight) mobileRight.textContent = `${formatAction(this.config.rightSingle)}`;
   }
 
   bindSettingsModal() {

@@ -217,6 +217,7 @@
 
 /* Interactive Tapping Pad */
 .mext-pad {
+  position: relative;
   margin: 12px;
   padding: 24px 14px;
   background: rgba(0, 240, 255, 0.04);
@@ -228,6 +229,23 @@
   -webkit-user-select: none;
   transition: all 0.2s ease;
   touch-action: manipulation;
+}
+
+@media (max-width: 600px) {
+  .mext-pad {
+    background: linear-gradient(to right, rgba(0, 240, 255, 0.06) 50%, rgba(251, 191, 36, 0.06) 50%);
+  }
+  .mext-pad::before {
+    content: '';
+    position: absolute;
+    top: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 70%;
+    background: linear-gradient(to bottom, transparent, var(--mext-primary), var(--mext-gold), transparent);
+    box-shadow: 0 0 8px var(--mext-glow);
+  }
 }
 
 .mext-pad:hover {
